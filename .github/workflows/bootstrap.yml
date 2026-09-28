@@ -1,0 +1,26 @@
+name: Publish verified source tree
+
+on:
+  push:
+    paths:
+      - rutaviva-upload-b26-f3bd3d8.zip
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replace bootstrap files with verified source
+        shell: bash
+        run: |
+          unzip -o rutaviva-upload-b26-f3bd3d8.zip
+          rm -f rutaviva-upload-b26-f3bd3d8.zip
+          rm -f .github/workflows/bootstrap.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Publish verified RutaViva Community beta"
+          git push
