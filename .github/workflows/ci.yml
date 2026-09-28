@@ -1,16 +1,34 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
+  normalize:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Normalize migration line endings once
+        shell: bash
+        run: |
+          sed -i 's/\r$//' migrations/*.sql
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --renormalize -- migrations/*.sql
+          git diff --cached --quiet && exit 0
+          git commit -m "Normalize migration line endings"
+          git push
+
   verify:
+    if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
