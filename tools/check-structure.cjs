@@ -5,7 +5,7 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
 const required = [
-  '.gitignore', '.env.example', 'AGENTS.md', 'BRIEF.md', 'TAREAS.md',
+  '.gitignore', '.gitattributes', '.env.example', 'AGENTS.md', 'BRIEF.md', 'TAREAS.md',
   'README.md', 'LICENSE', 'package.json', 'docs/ARQUITECTURA.md',
   'docs/MODELO-DATOS.md', 'docs/CONTRATO-API.md', 'docs/SEGURIDAD.md',
   'docs/PRIVACIDAD.md', 'docs/MODERACION.md', 'docs/RETENCION.md',
