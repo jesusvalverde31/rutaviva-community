@@ -16,7 +16,7 @@ const {
 const root = path.resolve(__dirname, '..');
 
 test('el proyecto contiene exactamente los archivos obligatorios declarados', () => {
-  assert.equal(required.length, 95);
+  assert.equal(required.length, 96);
   for (const file of required) assert.equal(fs.existsSync(path.join(root, file)), true, file);
   assert.deepEqual(filesIn(root), [...required].sort());
 });
