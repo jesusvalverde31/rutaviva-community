@@ -16,7 +16,7 @@ const {
 const root = path.resolve(__dirname, '..');
 
 test('el proyecto contiene exactamente los archivos obligatorios declarados', () => {
-  assert.equal(required.length, 96);
+  assert.equal(required.length, 97);
   for (const file of required) assert.equal(fs.existsSync(path.join(root, file)), true, file);
   assert.deepEqual(filesIn(root), [...required].sort());
 });
@@ -40,6 +40,15 @@ test('el proyecto no depende del directorio local histórico', () => {
   assert.match(pkg.scripts.migrate, /--env-file-if-exists=\.env/);
   assert.match(pkg.scripts['test:integration'], /--env-file-if-exists=\.env/);
   assert.equal(fs.existsSync(path.join(root, 'data')), false);
+});
+
+test('la ayuda accesible forma parte de la portada pública', () => {
+  const html = fs.readFileSync(path.join(root, 'public/index.html'), 'utf8');
+  assert.match(html, /href="#ayuda"/);
+  assert.match(html, /id="ayuda"/);
+  assert.match(html, /<details>/);
+  assert.match(html, /<summary>/);
+  assert.match(html, /<dl class="help-glossary">/);
 });
 
 test('el verificador ignora entornos privados pero conserva la plantilla', () => {

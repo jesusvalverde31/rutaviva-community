@@ -110,3 +110,25 @@ Nada de esta segunda sección se considera implementado.
 - [x] Rol `administrator` concedido de forma explícita a la única cuenta activa; herramienta posterior idempotente.
 - [ ] Validación con una segunda cuenta real: una persona aporta y otra modera, porque la auto-moderación está prohibida.
 - [ ] Prueba en móvil físico y lector de pantalla.
+
+## Bloque 27
+
+- [x] Despliegue público gratuito en Render conectado a Supabase y Brevo.
+- [x] Acceso confirmado desde ordenador y teléfono móvil mediante HTTPS.
+- [x] Dos cuentas reales activas, ambas con roles `collaborator` y `moderator`.
+- [x] Herramienta segura e idempotente de concesión por correo autorizado, con auditoría sin PII y 7 pruebas específicas.
+- [x] Suite local ampliada y comprobaciones públicas de `health`, `ready`, CSP y permisos.
+- [ ] Crear una aportación verdadera con una cuenta y revisarla/publicarla con la otra.
+- [ ] Comprobar la aportación publicada, su score y su historial en la web pública.
+
+## Bloque 28
+
+- [x] Enlace «Cómo usar» visible sin sesión.
+- [x] Guía estática con siete recorridos, resumen, glosario, privacidad, seguridad y ayuda ante errores.
+- [x] Flujos reales documentados para explorar, entrar, aportar, dibujar, enviar, moderar y confirmar.
+- [x] Separación de funciones explicada: nadie puede revisar su propia aportación.
+- [x] Navegación por teclado y salto al contenido comprobados en navegador.
+- [x] Vista de 360 px comprobada: ancho de documento 345/345, tabla de 301 px y cero elementos desbordados.
+- [x] Suite local 90/90 y revisión independiente aprobada sin hallazgos pendientes.
+- [ ] Publicar el Bloque 28 y comprobarlo en la URL pública.
+- [ ] Auditoría con lector de pantalla real.

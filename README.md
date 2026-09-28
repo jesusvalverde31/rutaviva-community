@@ -1,15 +1,15 @@
 # RutaViva Community Sevilla
 
-> **Estado actual:** beta comunitaria funcional conectada a Supabase Free con PostgreSQL/PostGIS. Las catorce migraciones están aplicadas y verificadas; identidad, sesiones, permisos, aportaciones geoespaciales, moderación, historial y outbox funcionan con permisos mínimos.
+> **Estado actual:** beta comunitaria pública en [rutaviva-community-sevilla-jv31.onrender.com](https://rutaviva-community-sevilla-jv31.onrender.com), conectada a Supabase Free con PostgreSQL/PostGIS. Identidad, sesiones, permisos, aportaciones geoespaciales, moderación, historial y correo funcionan con permisos mínimos.
 
 RutaViva Community está diseñada como un piloto comunitario de rutas peatonales orientativas para Sevilla. Permitirá consultar recorridos, proponer caminos o incidencias y entender por qué una alternativa ha sido recomendada. Ninguna aportación influirá en rutas públicas sin revisión.
 
 ## Estado verificable
 
-- **IMPLEMENTADO:** interfaz web responsive con MapLibre y alternativa textual; acceso sin contraseña; sesiones revocables; aportaciones Point/LineString; filtros; confianza determinista; reacciones; historial append-only; cola de moderación con control de versión; outbox cifrado y correo Brevo.
-- **VERIFICADO:** `npm run check`, suite local 80/80, integración real 25/25, catorce checksums, readiness real, permisos del rol runtime, CSP, mapa OSM y recorrido visual local. La integración revierte sus datos de prueba.
+- **IMPLEMENTADO:** interfaz web responsive con MapLibre y alternativa textual; guía pública «Cómo usar RutaViva»; acceso sin contraseña; sesiones revocables; aportaciones Point/LineString; filtros; confianza determinista; reacciones; historial append-only; cola de moderación con control de versión; outbox cifrado y correo Brevo.
+- **VERIFICADO:** suite local 90/90, integración real 25/25, catorce checksums, readiness de producción, permisos del rol runtime, CSP, mapa OSM, acceso desde ordenador y móvil, navegación por teclado y vista de 360 px sin desbordamiento. La integración revierte sus datos de prueba.
 - **PROPUESTO:** motor A→B sobre una red publicada, denuncias/apelaciones, dominio propio y ampliación progresiva fuera del piloto.
-- **NO VERIFICADO:** lector de pantalla real, dispositivo móvil físico, carga sostenida multiusuario y respuesta operativa 24/7. El plan gratuito puede dormir o pausar servicios.
+- **NO VERIFICADO:** lector de pantalla real, carga sostenida multiusuario, recorrido comunitario completo con una aportación real publicada y respuesta operativa 24/7. El plan gratuito puede dormir o pausar servicios.
 
 ## Orden de lectura
 

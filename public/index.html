@@ -13,7 +13,7 @@
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
   <header class="site-header">
     <a class="brand" href="#explorar" aria-label="RutaViva, explorar">Ruta<span>Viva</span></a>
-    <nav aria-label="Principal"><a href="#explorar">Explorar</a><a href="#aportar">Aportar</a><a id="moderation-nav" href="#moderar" hidden>Moderar</a><a href="#cuenta">Cuenta</a></nav>
+    <nav aria-label="Principal"><a href="#explorar">Explorar</a><a href="#aportar">Aportar</a><a href="#ayuda">Cómo usar</a><a id="moderation-nav" href="#moderar" hidden>Moderar</a><a href="#cuenta">Cuenta</a></nav>
   </header>
   <aside class="safety-banner">Ruta orientativa: comprueba siempre el entorno y la señalización.</aside>
   <main id="contenido" tabindex="-1">
@@ -38,7 +38,78 @@
       <div class="section-heading"><div><p class="eyebrow">Últimos siete días</p><h2 id="activity-title">Actividad comunitaria</h2></div><p id="activity-status" class="status"></p></div>
       <div id="kpis" class="kpis" aria-busy="true"></div>
       <canvas id="activity-chart" width="900" height="260" role="img" aria-label="Aportaciones recibidas y publicadas en los últimos siete días"></canvas>
-      <table><caption>Datos equivalentes al gráfico</caption><thead><tr><th>Día</th><th>Recibidas</th><th>Publicadas</th><th>Pendientes</th></tr></thead><tbody id="activity-table"></tbody></table>
+      <table class="activity-table"><caption>Datos equivalentes al gráfico</caption><thead><tr><th>Día</th><th>Recibidas</th><th>Publicadas</th><th>Pendientes</th></tr></thead><tbody id="activity-table"></tbody></table>
+    </section>
+    <section id="ayuda" class="section help" aria-labelledby="help-title">
+      <header class="help-intro">
+        <div><p class="eyebrow">Guía accesible</p><h2 id="help-title">Cómo usar RutaViva</h2></div>
+        <p>Esta guía está pensada para personas de cualquier edad o experiencia digital. Puedes leerla sin entrar en tu cuenta y sin activar JavaScript.</p>
+      </header>
+
+      <section class="help-quick" aria-labelledby="quick-title">
+        <h3 id="quick-title">Resumen rápido: cuatro pasos</h3>
+        <ol class="help-steps">
+          <li><strong>Explora.</strong> Consulta en el mapa la información publicada por la comunidad.</li>
+          <li><strong>Entra.</strong> Escribe tu correo y abre el enlace mágico que recibirás. No necesitas contraseña.</li>
+          <li><strong>Aporta.</strong> Describe un lugar real, señala el punto o camino y envíalo a revisión.</li>
+          <li><strong>Colabora.</strong> Confirma información útil o, si eres moderador, revisa aportaciones ajenas.</li>
+        </ol>
+      </section>
+
+      <div class="help-topics">
+        <details>
+          <summary>1. Explorar el mapa y usar los filtros</summary>
+          <div class="help-answer"><p>En <a href="#explorar">Explorar</a> puedes buscar por zona, título o descripción. También puedes combinar los filtros de estado y tipo. Pulsa <strong>Buscar</strong> para aplicarlos y <strong>Limpiar</strong> para volver a ver todo.</p><p>Cada aportación de la lista incluye <strong>Ver en mapa</strong> para localizar su dibujo y <strong>Ver historial</strong> para consultar sus cambios. El mapa y la lista muestran la misma información; si el mapa te resulta difícil, puedes usar la lista y el historial.</p></div>
+        </details>
+        <details>
+          <summary>2. Entrar con un enlace mágico</summary>
+          <div class="help-answer"><p>Ve a <a href="#cuenta">Cuenta</a>, escribe tu correo y pulsa <strong>Recibir enlace</strong>. Abre únicamente el mensaje más reciente y pulsa su enlace. No compartas ese enlace: permite entrar en tu cuenta.</p><p>Si caduca o ya fue utilizado, solicita uno nuevo. Revisa la carpeta de correo no deseado si tarda en llegar.</p></div>
+        </details>
+        <details>
+          <summary>3. Crear una aportación útil</summary>
+          <div class="help-answer"><p>En <a href="#aportar">Aportar</a>, elige qué ocurre y la zona. Escribe un título claro y explica solo hechos que hayas comprobado. Evita nombres, teléfonos, matrículas, fotografías de personas u otros datos privados.</p><p>La aportación se enviará a moderación. No cambiará ninguna ruta hasta que otra persona la revise y publique.</p></div>
+        </details>
+        <details>
+          <summary>4. Señalar un punto o dibujar un camino</summary>
+          <div class="help-answer"><p>Para un lugar concreto, centra el mapa y pulsa <strong>Añadir punto en el centro</strong>. Esta opción también sirve si te cuesta usar el ratón o la pantalla táctil.</p><p>Para un recorrido, pulsa <strong>Empezar dibujo</strong> y marca los puntos en orden. Usa <strong>Deshacer</strong> para quitar el último o <strong>Borrar</strong> para empezar de nuevo. Con teclado, usa el tabulador para llegar a los botones y pulsa Intro o Espacio.</p></div>
+        </details>
+        <details>
+          <summary>5. Revisar y enviar</summary>
+          <div class="help-answer"><p>Antes de enviar, comprueba el título, la descripción, la zona y el dibujo. Pulsa <strong>Revisar y enviar</strong> una sola vez y espera el mensaje de confirmación. Si aparece un error, conserva el texto y prueba de nuevo cuando tengas conexión.</p></div>
+        </details>
+        <details>
+          <summary>6. Moderar aportaciones</summary>
+          <div class="help-answer"><p>La opción <strong>Moderar</strong> aparece únicamente a las cuentas autorizadas. El proceso es: pulsa <strong>Tomar caso</strong>, comprueba los datos y el dibujo, escribe un motivo real y elige <strong>Publicar</strong> o <strong>Rechazar</strong>. Si otro moderador ha cambiado el caso, pulsa <strong>Actualizar</strong>, si el botón está disponible, y revisa de nuevo la información antes de decidir.</p><p><strong>Ningún moderador puede aprobar su propia aportación.</strong> Las cuentas con los mismos privilegios pueden aportar y moderar, pero deben revisarse mutuamente para mantener una revisión independiente.</p></div>
+        </details>
+        <details>
+          <summary>7. Confirmar información de la comunidad</summary>
+          <div class="help-answer"><p>Primero entra en tu cuenta y abre una aportación publicada por otra persona. Pulsa <strong>Coincide</strong> si la información sigue siendo correcta o <strong>No coincide</strong> si lo que observas es distinto. Si ya respondiste, puedes pulsar <strong>Quitar respuesta</strong> para retirar esa valoración. No puedes valorar tu propia aportación.</p><p>Confirma solo aquello que hayas observado en el lugar y que siga siendo cierto. Si la realidad ha cambiado, crea una aportación nueva y clara para que el equipo pueda revisarla. Una confirmación no sustituye la señalización oficial.</p></div>
+        </details>
+      </div>
+
+      <div class="help-reference">
+        <section aria-labelledby="glossary-title">
+          <h3 id="glossary-title">Palabras que verás</h3>
+          <dl class="help-glossary">
+            <dt>Borrador</dt><dd>Información que todavía estás preparando.</dd>
+            <dt>Pendiente</dt><dd>Aportación enviada y a la espera de una revisión.</dd>
+            <dt>En revisión</dt><dd>Un moderador está comprobando la aportación.</dd>
+            <dt>Publicada</dt><dd>Aportación revisada y visible para la comunidad.</dd>
+            <dt>Ruta orientativa</dt><dd>Información de ayuda que no sustituye señales, normas ni una comprobación del entorno.</dd>
+          </dl>
+        </section>
+        <section aria-labelledby="problems-title">
+          <h3 id="problems-title">Si algo no funciona</h3>
+          <ul class="help-checklist">
+            <li>Lee el mensaje que aparece junto al botón o formulario.</li>
+            <li>Comprueba tu conexión y vuelve a intentarlo una sola vez.</li>
+            <li>Recarga la página si el mapa permanece en “Cargando”.</li>
+            <li>Solicita otro enlace mágico si el anterior ha caducado.</li>
+            <li>Usa la lista o “Añadir punto en el centro” si no puedes manejar el mapa.</li>
+          </ul>
+        </section>
+      </div>
+      <aside class="help-safety" aria-labelledby="safety-title"><h3 id="safety-title">Privacidad y seguridad</h3><p>No publiques datos personales ni entres en zonas peligrosas para comprobar un camino. RutaViva ofrece una <strong>ruta orientativa</strong>: sigue siempre la señalización, las normas y tu propio criterio.</p></aside>
     </section>
     <section id="aportar" class="section card" aria-labelledby="contribute-title">
       <p class="eyebrow">Tu conocimiento cuenta</p><h2 id="contribute-title" tabindex="-1">Aportar un punto o camino</h2>
