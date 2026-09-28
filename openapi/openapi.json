@@ -1,0 +1,259 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "RutaViva Community API",
+    "version": "0.5.0",
+    "description": "API comunitaria del piloto de rutas orientativas: aportaciones geoespaciales, reacciones, historial, moderación y acceso sin contraseña."
+  },
+  "servers": [{ "url": "http://127.0.0.1:4329", "description": "Desarrollo local" }],
+  "paths": {
+    "/": {
+      "get": { "summary": "Sirve la aplicación web local", "responses": { "200": { "description": "HTML de la aplicación", "content": { "text/html": {} } } } }
+    },
+    "/auth/verify": {
+      "get": { "summary": "Sirve la vista que consume el fragmento de enlace mágico", "responses": { "200": { "description": "HTML de la aplicación", "content": { "text/html": {} } } } }
+    },
+    "/api/v1/health": {
+      "get": {
+        "summary": "Comprueba únicamente que el proceso responde",
+        "responses": {
+          "200": { "description": "Proceso disponible", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Health" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    },
+    "/api/v1/ready": {
+      "get": {
+        "summary": "Comprueba base, rol, PostGIS, migraciones, relaciones y funciones",
+        "responses": {
+          "200": { "description": "Servicio preparado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Ready" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "503": { "$ref": "#/components/responses/Unavailable" }
+        }
+      }
+    },
+    "/api/v1/bootstrap": {
+      "get": {
+        "summary": "Obtiene la configuración pública mínima",
+        "responses": {
+          "200": { "description": "Datos de arranque", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Bootstrap" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "503": { "$ref": "#/components/responses/Unavailable" }
+        }
+      }
+    },
+    "/api/v1/zones": {
+      "get": {
+        "summary": "Lista zonas públicas activas",
+        "parameters": [
+          { "name": "q", "in": "query", "schema": { "type": "string", "minLength": 1, "maxLength": 80 } },
+          { "name": "cursor", "in": "query", "description": "Cursor opaco base64url.", "schema": { "type": "string", "minLength": 1, "maxLength": 256, "pattern": "^[A-Za-z0-9_-]+$" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 } }
+        ],
+        "responses": {
+          "200": { "description": "Página de zonas", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ZonesPage" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "422": { "$ref": "#/components/responses/Validation" },
+          "503": { "$ref": "#/components/responses/Unavailable" }
+        }
+      }
+    },
+    "/api/v1/contributions": {
+      "get": { "summary": "Lista aportaciones visibles con filtros combinables", "parameters": [
+        { "name": "q", "in": "query", "schema": { "type": "string", "minLength": 1, "maxLength": 80 } },
+        { "name": "status", "in": "query", "schema": { "$ref": "#/components/schemas/ContributionStatus" } },
+        { "name": "kind", "in": "query", "schema": { "$ref": "#/components/schemas/ContributionKind" } },
+        { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 } }
+      ], "responses": { "200": { "description": "Anónimo ve solo publicadas; autor sus aportaciones; moderación toda la cola." }, "422": { "$ref": "#/components/responses/Validation" }, "503": { "$ref": "#/components/responses/Unavailable" } } },
+      "post": { "summary": "Crea un borrador idempotente", "security": [{ "sessionCookie": [], "csrfHeader": [] }], "parameters": [{ "$ref": "#/components/parameters/Origin" }, { "$ref": "#/components/parameters/Csrf" }, { "$ref": "#/components/parameters/IdempotencyKey" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ContributionInput" } } } }, "responses": { "201": { "description": "Borrador creado o replay exacto" }, "401": { "$ref": "#/components/responses/Unauthorized" }, "403": { "$ref": "#/components/responses/Forbidden" }, "409": { "$ref": "#/components/responses/Conflict" }, "422": { "$ref": "#/components/responses/Validation" }, "429": { "$ref": "#/components/responses/RateLimited" } } }
+    },
+    "/api/v1/contributions/{id}": {
+      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+      "get": { "summary": "Obtiene una aportación aplicando visibilidad", "responses": { "200": { "description": "Aportación" }, "404": { "$ref": "#/components/responses/NotFound" } } },
+      "patch": { "summary": "Edita un borrador propio con control de versión", "security": [{ "sessionCookie": [], "csrfHeader": [] }], "parameters": [{ "$ref": "#/components/parameters/Origin" }, { "$ref": "#/components/parameters/Csrf" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ContributionUpdate" } } } }, "responses": { "200": { "description": "Borrador actualizado" }, "401": { "$ref": "#/components/responses/Unauthorized" }, "403": { "$ref": "#/components/responses/Forbidden" }, "412": { "$ref": "#/components/responses/Precondition" }, "422": { "$ref": "#/components/responses/Validation" } } }
+    },
+    "/api/v1/contributions/{id}/history": { "get": { "summary": "Lista el historial saneado y append-only", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "200": { "description": "Historial visible" }, "404": { "$ref": "#/components/responses/NotFound" } } } },
+    "/api/v1/contributions/{id}/submit": { "post": { "summary": "Envía un borrador propio a moderación", "security": [{ "sessionCookie": [], "csrfHeader": [] }], "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }, { "$ref": "#/components/parameters/Origin" }, { "$ref": "#/components/parameters/Csrf" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/VersionInput" } } } }, "responses": { "200": { "description": "Enviada" }, "412": { "$ref": "#/components/responses/Precondition" }, "422": { "$ref": "#/components/responses/Validation" } } } },
+    "/api/v1/contributions/{id}/withdraw": { "post": { "summary": "Retira una aportación propia y cierra el caso pendiente", "security": [{ "sessionCookie": [], "csrfHeader": [] }], "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }, { "$ref": "#/components/parameters/Origin" }, { "$ref": "#/components/parameters/Csrf" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/VersionInput" } } } }, "responses": { "200": { "description": "Retirada" }, "412": { "$ref": "#/components/responses/Precondition" }, "422": { "$ref": "#/components/responses/Validation" } } } },
+    "/api/v1/contributions/{id}/reaction": {
+      "post": { "summary": "Confirma o rechaza una aportación publicada ajena", "security": [{ "sessionCookie": [], "csrfHeader": [] }], "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }, { "$ref": "#/components/parameters/Origin" }, { "$ref": "#/components/parameters/Csrf" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ReactionInput" } } } }, "responses": { "200": { "description": "Reacción guardada idempotentemente" }, "403": { "$ref": "#/components/responses/Forbidden" }, "422": { "$ref": "#/components/responses/Validation" }, "429": { "$ref": "#/components/responses/RateLimited" } } },
+      "delete": { "summary": "Elimina la reacción propia de forma idempotente", "security": [{ "sessionCookie": [], "csrfHeader": [] }], "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }, { "$ref": "#/components/parameters/Origin" }, { "$ref": "#/components/parameters/Csrf" }], "responses": { "204": { "description": "Reacción ausente" }, "403": { "$ref": "#/components/responses/Forbidden" } } }
+    },
+    "/api/v1/community/activity": { "get": { "summary": "Actividad comunitaria agregada de siete días", "responses": { "200": { "description": "Serie para KPIs, canvas y tabla" }, "503": { "$ref": "#/components/responses/Unavailable" } } } },
+    "/api/v1/moderation/cases": { "get": { "summary": "Lista la cola para moderadores y administradores", "security": [{ "sessionCookie": [] }], "responses": { "200": { "description": "Cola de moderación" }, "401": { "$ref": "#/components/responses/Unauthorized" }, "403": { "$ref": "#/components/responses/Forbidden" } } } },
+    "/api/v1/moderation/cases/{id}/claim": { "post": { "summary": "Reclama atómicamente un caso pendiente", "security": [{ "sessionCookie": [], "csrfHeader": [] }], "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }, { "$ref": "#/components/parameters/Origin" }, { "$ref": "#/components/parameters/Csrf" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/VersionInput" } } } }, "responses": { "200": { "description": "Caso reclamado" }, "403": { "$ref": "#/components/responses/Forbidden" }, "412": { "$ref": "#/components/responses/Precondition" } } } },
+    "/api/v1/moderation/cases/{id}/publish": { "post": { "summary": "Publica el caso reclamado por el moderador", "security": [{ "sessionCookie": [], "csrfHeader": [] }], "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }, { "$ref": "#/components/parameters/Origin" }, { "$ref": "#/components/parameters/Csrf" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DecisionInput" } } } }, "responses": { "200": { "description": "Publicada" }, "403": { "$ref": "#/components/responses/Forbidden" }, "412": { "$ref": "#/components/responses/Precondition" }, "422": { "$ref": "#/components/responses/Validation" } } } },
+    "/api/v1/moderation/cases/{id}/reject": { "post": { "summary": "Rechaza el caso reclamado por el moderador", "security": [{ "sessionCookie": [], "csrfHeader": [] }], "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }, { "$ref": "#/components/parameters/Origin" }, { "$ref": "#/components/parameters/Csrf" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DecisionInput" } } } }, "responses": { "200": { "description": "Rechazada" }, "403": { "$ref": "#/components/responses/Forbidden" }, "412": { "$ref": "#/components/responses/Precondition" }, "422": { "$ref": "#/components/responses/Validation" } } } },
+    "/api/v1/auth/request-link": {
+      "post": {
+        "summary": "Encola un enlace mágico con respuesta anti-enumeración",
+        "description": "Falla con 503 antes de persistir cuando base, secretos de autenticación y proveedor real de correo no están operativos.",
+        "parameters": [{ "$ref": "#/components/parameters/Origin" }, { "$ref": "#/components/parameters/IdempotencyKey" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EmailRequest" } } } },
+        "responses": {
+          "202": { "description": "Solicitud aceptada sin revelar si existe la cuenta", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Accepted" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "413": { "$ref": "#/components/responses/PayloadTooLarge" },
+          "415": { "$ref": "#/components/responses/UnsupportedMediaType" },
+          "422": { "$ref": "#/components/responses/Validation" },
+          "429": { "$ref": "#/components/responses/RateLimited" },
+          "503": { "$ref": "#/components/responses/Unavailable" }
+        }
+      }
+    },
+    "/api/v1/auth/verify": {
+      "post": {
+        "summary": "Consume una vez el token y crea una sesión",
+        "parameters": [{ "$ref": "#/components/parameters/Origin" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TokenRequest" } } } },
+        "responses": {
+          "200": { "description": "Sesión creada y cookie HttpOnly establecida", "headers": { "Set-Cookie": { "schema": { "type": "string" }, "description": "__Host-rv_session en producción; rv_session en desarrollo." } }, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Authenticated" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "413": { "$ref": "#/components/responses/PayloadTooLarge" },
+          "415": { "$ref": "#/components/responses/UnsupportedMediaType" },
+          "422": { "$ref": "#/components/responses/Validation" },
+          "429": { "$ref": "#/components/responses/RateLimited" },
+          "503": { "$ref": "#/components/responses/Unavailable" }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "summary": "Cierra de forma idempotente la sesión actual y limpia la cookie",
+        "description": "Origin siempre es obligatorio. Una sesión válida exige CSRF; una cookie ausente, inválida o ya revocada se limpia y también devuelve 204.",
+        "security": [{}, { "sessionCookie": [], "csrfHeader": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/Origin" }, { "$ref": "#/components/parameters/CsrfOptional" }],
+        "responses": {
+          "204": { "description": "Sesión revocada si seguía activa y cookie eliminada en todos los casos" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "503": { "$ref": "#/components/responses/Unavailable" }
+        }
+      }
+    },
+    "/api/v1/auth/sessions": {
+      "get": {
+        "summary": "Lista las sesiones activas propias",
+        "security": [{ "sessionCookie": [] }],
+        "responses": {
+          "200": { "description": "Sesiones propias", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SessionsPage" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "503": { "$ref": "#/components/responses/Unavailable" }
+        }
+      }
+    },
+    "/api/v1/auth/sessions/{id}": {
+      "delete": {
+        "summary": "Revoca una sesión propia",
+        "security": [{ "sessionCookie": [], "csrfHeader": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } },
+          { "$ref": "#/components/parameters/Origin" },
+          { "$ref": "#/components/parameters/Csrf" }
+        ],
+        "responses": {
+          "204": { "description": "Sesión revocada" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/Validation" },
+          "503": { "$ref": "#/components/responses/Unavailable" }
+        }
+      }
+    },
+    "/api/v1/auth/csrf": {
+      "get": {
+        "summary": "Obtiene el token CSRF ligado a la sesión",
+        "security": [{ "sessionCookie": [] }],
+        "responses": {
+          "200": { "description": "Token CSRF", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Csrf" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "503": { "$ref": "#/components/responses/Unavailable" }
+        }
+      }
+    },
+    "/api/v1/users/me": {
+      "get": {
+        "summary": "Obtiene el perfil privado mínimo de la cuenta",
+        "security": [{ "sessionCookie": [] }],
+        "responses": {
+          "200": { "description": "Cuenta propia", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Me" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "503": { "$ref": "#/components/responses/Unavailable" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sessionCookie": { "type": "apiKey", "in": "cookie", "name": "__Host-rv_session", "description": "Cookie opaca Secure, HttpOnly, SameSite=Lax y Path=/ en producción. Desarrollo usa rv_session sin Secure." },
+      "csrfHeader": { "type": "apiKey", "in": "header", "name": "X-CSRF-Token" }
+    },
+    "parameters": {
+      "Origin": { "name": "Origin", "in": "header", "required": true, "description": "Debe coincidir exactamente con PUBLIC_ORIGIN.", "schema": { "type": "string", "format": "uri" } },
+      "IdempotencyKey": { "name": "Idempotency-Key", "in": "header", "required": true, "schema": { "type": "string", "format": "uuid" } },
+      "Csrf": { "name": "X-CSRF-Token", "in": "header", "required": true, "schema": { "type": "string", "minLength": 43, "maxLength": 43 } },
+      "CsrfOptional": { "name": "X-CSRF-Token", "in": "header", "required": false, "description": "Obligatorio únicamente cuando la cookie identifica una sesión válida.", "schema": { "type": "string", "minLength": 43, "maxLength": 43 } }
+    },
+    "headers": {
+      "RetryAfter": { "description": "Segundos mínimos antes de reintentar.", "schema": { "type": "integer", "minimum": 1 } }
+    },
+    "responses": {
+      "BadRequest": { "description": "Solicitud o Host no válido", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } },
+      "Unauthorized": { "description": "Sesión o enlace no válido", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } },
+      "Forbidden": { "description": "Origin, CSRF o cuenta no permitido", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } },
+      "NotFound": { "description": "Recurso propio no encontrado", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } },
+      "Conflict": { "description": "Conflicto de idempotencia", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } },
+      "Precondition": { "description": "La versión esperada ya no es actual", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } },
+      "PayloadTooLarge": { "description": "Cuerpo superior al límite", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } },
+      "UnsupportedMediaType": { "description": "Tipo de contenido no admitido", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } },
+      "Validation": { "description": "Esquema o dato no válido", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } },
+      "RateLimited": { "description": "Límite persistente alcanzado", "headers": { "Retry-After": { "$ref": "#/components/headers/RetryAfter" } }, "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } },
+      "Unavailable": { "description": "Dependencia, autenticación o capacidad de correo no disponible", "headers": { "Retry-After": { "$ref": "#/components/headers/RetryAfter" } }, "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } }
+    },
+    "schemas": {
+      "RequestId": { "type": "string", "format": "uuid" },
+      "Health": { "type": "object", "additionalProperties": false, "required": ["status", "service", "requestId"], "properties": { "status": { "const": "ok" }, "service": { "const": "rutaviva-community" }, "requestId": { "$ref": "#/components/schemas/RequestId" } } },
+      "Ready": { "type": "object", "additionalProperties": false, "required": ["status", "checks", "requestId"], "properties": {
+        "status": { "const": "ready" },
+        "checks": { "type": "object", "additionalProperties": false, "required": ["database", "role", "postgis", "migrations", "relations", "functions"], "properties": { "database": { "const": "ok" }, "role": { "const": "ok" }, "postgis": { "const": "ok" }, "migrations": { "const": "ok" }, "relations": { "const": "ok" }, "functions": { "const": "ok" } } },
+        "requestId": { "$ref": "#/components/schemas/RequestId" }
+      } },
+      "Bootstrap": { "type": "object", "additionalProperties": false, "required": ["service", "apiVersion", "pilot", "capabilities", "map", "links", "advertencia", "requestId"], "properties": {
+        "service": { "const": "rutaviva-community" }, "apiVersion": { "const": "v1" },
+        "pilot": { "type": "object", "additionalProperties": false, "required": ["id", "slug", "name", "countryCode", "isApproximate", "center", "zoneCount"], "properties": { "id": { "type": "string", "format": "uuid" }, "slug": { "type": "string" }, "name": { "type": "string" }, "countryCode": { "type": "string", "minLength": 2, "maxLength": 2 }, "isApproximate": { "type": "boolean" }, "center": { "type": "object", "additionalProperties": false, "required": ["latitude", "longitude"], "properties": { "latitude": { "type": "number" }, "longitude": { "type": "number" } } }, "zoneCount": { "type": "integer", "minimum": 0 } } },
+        "capabilities": { "type": "object", "additionalProperties": false, "required": ["zones", "routes", "contributions", "moderation", "accounts"], "properties": { "zones": { "type": "boolean" }, "routes": { "type": "boolean" }, "contributions": { "type": "boolean" }, "moderation": { "type": "boolean" }, "accounts": { "type": "boolean" } } },
+        "map": { "type": "object", "additionalProperties": false, "required": ["tileUrl", "attribution"], "properties": { "tileUrl": { "type": "string" }, "attribution": { "type": "string" } } },
+        "links": { "type": "object", "additionalProperties": false, "required": ["health", "ready", "zones", "contributions", "activity"], "properties": { "health": { "type": "string" }, "ready": { "type": "string" }, "zones": { "type": "string" }, "contributions": { "type": "string" }, "activity": { "type": "string" } } },
+        "advertencia": { "type": "string" }, "requestId": { "$ref": "#/components/schemas/RequestId" }
+      } },
+      "Zone": { "type": "object", "additionalProperties": false, "required": ["id", "slug", "name", "sortOrder", "isApproximate", "bbox"], "properties": { "id": { "type": "string", "format": "uuid" }, "slug": { "type": "string" }, "name": { "type": "string" }, "sortOrder": { "type": "integer" }, "isApproximate": { "type": "boolean" }, "bbox": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "type": "number" } } } },
+      "ZonesPage": { "type": "object", "additionalProperties": false, "required": ["data", "page", "requestId"], "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/Zone" } }, "page": { "type": "object", "additionalProperties": false, "required": ["limit", "nextCursor"], "properties": { "limit": { "type": "integer" }, "nextCursor": { "type": ["string", "null"] } } }, "requestId": { "$ref": "#/components/schemas/RequestId" } } },
+      "EmailRequest": { "type": "object", "additionalProperties": false, "required": ["email"], "properties": { "email": { "type": "string", "minLength": 3, "maxLength": 254 } } },
+      "TokenRequest": { "type": "object", "additionalProperties": false, "required": ["token"], "properties": { "token": { "type": "string", "minLength": 80, "maxLength": 80, "writeOnly": true } } },
+      "Accepted": { "type": "object", "additionalProperties": false, "required": ["accepted", "message", "requestId"], "properties": { "accepted": { "const": true }, "message": { "type": "string" }, "requestId": { "$ref": "#/components/schemas/RequestId" } } },
+      "User": { "type": "object", "additionalProperties": false, "required": ["id", "alias", "status", "version", "roles"], "properties": { "id": { "type": "string", "format": "uuid" }, "alias": { "type": "string" }, "status": { "type": "string", "enum": ["active"] }, "version": { "type": "integer", "minimum": 1 }, "roles": { "type": "array", "uniqueItems": true, "items": { "type": "string", "enum": ["collaborator", "moderator", "administrator"] } } } },
+      "Authenticated": { "type": "object", "additionalProperties": false, "required": ["authenticated", "user", "requestId"], "properties": { "authenticated": { "const": true }, "user": { "$ref": "#/components/schemas/User" }, "requestId": { "$ref": "#/components/schemas/RequestId" } } },
+      "Session": { "type": "object", "additionalProperties": false, "required": ["id", "createdAt", "lastSeenAt", "expiresAt", "current"], "properties": { "id": { "type": "string", "format": "uuid" }, "createdAt": { "type": "string", "format": "date-time" }, "lastSeenAt": { "type": "string", "format": "date-time" }, "expiresAt": { "type": "string", "format": "date-time" }, "current": { "type": "boolean" } } },
+      "SessionsPage": { "type": "object", "additionalProperties": false, "required": ["data", "requestId"], "properties": { "data": { "type": "array", "maxItems": 5, "items": { "$ref": "#/components/schemas/Session" } }, "requestId": { "$ref": "#/components/schemas/RequestId" } } },
+      "Csrf": { "type": "object", "additionalProperties": false, "required": ["csrfToken", "requestId"], "properties": { "csrfToken": { "type": "string", "minLength": 43, "maxLength": 43, "readOnly": true }, "requestId": { "$ref": "#/components/schemas/RequestId" } } },
+      "Me": { "type": "object", "additionalProperties": false, "required": ["user", "requestId"], "properties": { "user": { "$ref": "#/components/schemas/User" }, "requestId": { "$ref": "#/components/schemas/RequestId" } } },
+      "ContributionKind": { "type": "string", "enum": ["shortcut", "accessible", "barrier", "closure", "lighting"] },
+      "ContributionStatus": { "type": "string", "enum": ["draft", "submitted", "under_review", "published", "rejected", "withdrawn"] },
+      "Position": { "type": "array", "prefixItems": [{ "type": "number", "minimum": -180, "maximum": 180 }, { "type": "number", "minimum": -90, "maximum": 90 }], "minItems": 2, "maxItems": 2 },
+      "Geometry": { "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["type", "coordinates"], "properties": { "type": { "const": "Point" }, "coordinates": { "$ref": "#/components/schemas/Position" } } },
+        { "type": "object", "additionalProperties": false, "required": ["type", "coordinates"], "properties": { "type": { "const": "LineString" }, "coordinates": { "type": "array", "minItems": 2, "maxItems": 50, "items": { "$ref": "#/components/schemas/Position" } } } }
+      ] },
+      "ContributionInput": { "type": "object", "additionalProperties": false, "required": ["cityId", "kind", "title", "geometry"], "properties": { "cityId": { "type": "string", "format": "uuid" }, "zoneId": { "type": ["string", "null"], "format": "uuid" }, "kind": { "$ref": "#/components/schemas/ContributionKind" }, "title": { "type": "string", "minLength": 5, "maxLength": 80 }, "description": { "type": "string", "maxLength": 500 }, "geometry": { "$ref": "#/components/schemas/Geometry" } } },
+      "ContributionUpdate": { "type": "object", "additionalProperties": false, "required": ["version", "title", "geometry"], "properties": { "version": { "type": "integer", "minimum": 1 }, "title": { "type": "string", "minLength": 5, "maxLength": 80 }, "description": { "type": "string", "maxLength": 500 }, "geometry": { "$ref": "#/components/schemas/Geometry" } } },
+      "VersionInput": { "type": "object", "additionalProperties": false, "required": ["version"], "properties": { "version": { "type": "integer", "minimum": 1 } } },
+      "ReactionInput": { "type": "object", "additionalProperties": false, "required": ["reaction"], "properties": { "reaction": { "type": "string", "enum": ["confirm", "reject"] } } },
+      "DecisionInput": { "type": "object", "additionalProperties": false, "required": ["version", "reason"], "properties": { "version": { "type": "integer", "minimum": 1 }, "reason": { "type": "string", "minLength": 3, "maxLength": 300 } } },
+      "Problem": { "type": "object", "additionalProperties": false, "required": ["type", "title", "status", "code", "requestId"], "properties": { "type": { "type": "string" }, "title": { "type": "string" }, "status": { "type": "integer", "minimum": 400, "maximum": 599 }, "code": { "type": "string" }, "requestId": { "$ref": "#/components/schemas/RequestId" }, "errors": { "type": "array", "items": { "type": "object" } } } }
+    }
+  }
+}

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Mapa comunitario moderado de atajos y caminos peatonales de Sevilla.">
+  <title>RutaViva Community Sevilla</title>
+  <link rel="stylesheet" href="/vendor/maplibre/maplibre-gl.css">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header class="site-header">
+    <a class="brand" href="#explorar" aria-label="RutaViva, explorar">Ruta<span>Viva</span></a>
+    <nav aria-label="Principal"><a href="#explorar">Explorar</a><a href="#aportar">Aportar</a><a id="moderation-nav" href="#moderar" hidden>Moderar</a><a href="#cuenta">Cuenta</a></nav>
+  </header>
+  <aside class="safety-banner">Ruta orientativa: comprueba siempre el entorno y la señalización.</aside>
+  <main id="contenido" tabindex="-1">
+    <section class="hero" aria-labelledby="hero-title">
+      <div><p class="eyebrow">Sevilla · beta comunitaria</p><h1 id="hero-title">Los caminos que conoce el barrio.</h1><p class="lead">Dibuja un atajo, confirma lo que ves y ayuda a construir una red peatonal explicable.</p></div>
+      <div class="hero-stat"><strong id="hero-published">0</strong><span>aportaciones publicadas</span></div>
+    </section>
+    <section id="explorar" class="section" aria-labelledby="explore-title">
+      <div class="section-heading"><div><p class="eyebrow">Mapa vivo</p><h2 id="explore-title">Explorar aportaciones</h2></div><p id="contributions-status" class="status" role="status" aria-live="polite"></p></div>
+      <form id="filters" class="filters" role="search">
+        <label>Buscar<input id="search" name="q" type="search" maxlength="80" placeholder="Zona, título o descripción"></label>
+        <label>Estado<select id="status-filter" name="status"><option value="">Todas</option><option value="submitted">Pendientes</option><option value="under_review">En revisión</option><option value="published">Publicadas</option></select></label>
+        <label>Tipo<select id="kind-filter" name="kind"><option value="">Todos</option><option value="shortcut">Atajo</option><option value="accessible">Camino accesible</option><option value="barrier">Barrera</option><option value="closure">Cierre</option><option value="lighting">Iluminación</option></select></label>
+        <button type="submit">Buscar</button><button id="clear-filters" class="secondary" type="button">Limpiar</button>
+      </form>
+      <div class="explore-layout">
+        <div class="list-pane"><ul id="contributions-list" class="contribution-list" aria-busy="true"></ul><button id="contributions-retry" class="secondary" hidden>Reintentar</button></div>
+        <div class="map-wrap"><div id="map" aria-label="Mapa de aportaciones de Sevilla"></div><p id="map-status" class="map-status" role="status">Cargando mapa…</p></div>
+      </div>
+    </section>
+    <section class="section" aria-labelledby="activity-title">
+      <div class="section-heading"><div><p class="eyebrow">Últimos siete días</p><h2 id="activity-title">Actividad comunitaria</h2></div><p id="activity-status" class="status"></p></div>
+      <div id="kpis" class="kpis" aria-busy="true"></div>
+      <canvas id="activity-chart" width="900" height="260" role="img" aria-label="Aportaciones recibidas y publicadas en los últimos siete días"></canvas>
+      <table><caption>Datos equivalentes al gráfico</caption><thead><tr><th>Día</th><th>Recibidas</th><th>Publicadas</th><th>Pendientes</th></tr></thead><tbody id="activity-table"></tbody></table>
+    </section>
+    <section id="aportar" class="section card" aria-labelledby="contribute-title">
+      <p class="eyebrow">Tu conocimiento cuenta</p><h2 id="contribute-title" tabindex="-1">Aportar un punto o camino</h2>
+      <p>Se enviará a moderación y no cambiará ninguna ruta hasta publicarse.</p>
+      <form id="contribution-form" novalidate>
+        <div class="form-grid"><label>Qué ocurre<select id="contribution-kind" required><option value="shortcut">Atajo útil</option><option value="accessible">Camino accesible</option><option value="barrier">Barrera</option><option value="closure">Cierre temporal</option><option value="lighting">Iluminación deficiente</option></select></label><label>Zona<select id="contribution-zone"><option value="">Sin zona concreta</option></select></label></div>
+        <label>Título<input id="contribution-title" required minlength="5" maxlength="80" placeholder="Ej. Paso peatonal junto al parque"></label>
+        <label>Descripción<textarea id="contribution-description" maxlength="500" rows="3" placeholder="Describe lo que una persona encontrará"></textarea></label>
+        <fieldset><legend>Dónde está</legend><div class="draw-actions"><button id="draw-start" type="button">Empezar dibujo</button><button id="draw-center" class="secondary" type="button">Añadir punto en el centro</button><button id="draw-undo" class="secondary" type="button">Deshacer</button><button id="draw-clear" class="secondary" type="button">Borrar</button></div><ol id="draw-points" class="points-list"></ol></fieldset>
+        <p id="contribution-status" class="status" role="status" aria-live="polite"></p><button type="submit">Revisar y enviar</button>
+      </form>
+      <p id="contribution-login-note">Necesitas entrar para enviar una aportación.</p>
+    </section>
+    <section id="moderar" class="section" aria-labelledby="moderation-title" hidden>
+      <div class="section-heading"><div><p class="eyebrow">Responsabilidad compartida</p><h2 id="moderation-title">Cola de moderación</h2></div><button id="moderation-refresh" class="secondary">Actualizar</button></div>
+      <p id="moderation-status" class="status" role="status"></p><ul id="moderation-list" class="contribution-list"></ul>
+    </section>
+    <section id="cuenta" class="section account-grid" aria-labelledby="account-heading">
+      <div id="access-section" class="card"><h2 id="account-heading">Entrar con un enlace</h2><p>No necesitas contraseña.</p><form id="access-form" novalidate hidden><label for="email">Correo electrónico</label><div class="form-row"><input id="email" type="email" autocomplete="email" required maxlength="254" aria-describedby="access-status local-note"><button type="submit">Recibir enlace</button></div></form><p id="access-status" class="status" role="status" aria-live="polite"></p><p id="local-note" class="local-note">Abre el enlace en este mismo ordenador.</p></div>
+      <div id="verify-section" class="card" hidden><h2 id="verify-title" tabindex="-1">Comprobando tu enlace</h2><p id="verify-status" class="status" role="status" aria-live="assertive"></p><button id="verify-retry" hidden>Reintentar</button><a id="verify-new" class="button-link" href="#cuenta" hidden>Solicitar otro enlace</a></div>
+      <div id="account-section" class="card" hidden><div class="section-heading"><h2 id="account-title" tabindex="-1">Mi cuenta</h2><button id="logout" class="secondary">Cerrar sesión</button></div><dl id="profile" class="profile"></dl><h3>Sesiones abiertas</h3><ul id="sessions" class="session-list"></ul><p id="account-status" class="status" role="status"></p><button id="sessions-retry" class="secondary" hidden>Reintentar</button></div>
+    </section>
+  </main>
+  <footer><p>RutaViva Community · Datos orientativos · <a href="https://www.openstreetmap.org/copyright" rel="external">© OpenStreetMap contributors</a></p></footer>
+</body>
+</html>

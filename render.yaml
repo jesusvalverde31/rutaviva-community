@@ -1,0 +1,58 @@
+services:
+  - type: web
+    name: rutaviva-community-sevilla-jv31
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci --omit=dev --cache .npm-cache && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_VERSION
+        value: 24.21.0
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: TRUST_PROXY_HOPS
+        value: 1
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_RUNTIME_ROLE
+        value: rutaviva_runtime
+      - key: DATABASE_SSL
+        value: "true"
+      - key: DATABASE_CA_FILE
+        value: certs/supabase-prod-ca-2021.crt
+      - key: DATABASE_POOL_MAX
+        value: 3
+      - key: DATABASE_CONNECT_TIMEOUT_MS
+        value: 5000
+      - key: DATABASE_QUERY_TIMEOUT_MS
+        value: 5000
+      - key: SESSION_SECRET
+        sync: false
+      - key: CSRF_SECRET
+        sync: false
+      - key: IDENTITY_ENCRYPTION_KEY
+        sync: false
+      - key: IP_HASH_SECRET
+        sync: false
+      - key: EMAIL_PROVIDER
+        value: brevo
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_SENDER
+        sync: false
+      - key: BREVO_SENDER_NAME
+        value: RutaViva Community
+      - key: EMAIL_POLL_MS
+        value: 1000
+      - key: EMAIL_LEASE_SECONDS
+        value: 60
+      - key: EMAIL_TIMEOUT_MS
+        value: 10000
+      - key: MAP_TILE_URL
+        value: https://tile.openstreetmap.org/{z}/{x}/{y}.png
+      - key: LOG_LEVEL
+        value: info

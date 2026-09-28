@@ -1,0 +1,24 @@
+# Migraciones PostgreSQL/PostGIS
+
+Las ocho migraciones son forward-only y se aplican en orden mediante `npm run migrate`. El migrador usa `MIGRATION_DATABASE_URL`, que fuera de localhost debe ser una conexión directa o shared pooler en modo sesión por el puerto 5432; el puerto transaccional 6543 queda reservado al runtime y se rechaza para migrar. El proceso toma un advisory lock, verifica secuencia y SHA-256, y ejecuta cada archivo dentro de su propia transacción. Una versión aplicada no se modifica: cualquier diferencia de nombre o checksum detiene el proceso.
+
+Antes del DDL, el migrador crea `rutaviva_runtime` si falta, con LOGIN, `NOBYPASSRLS` y sin privilegios administrativos; si ya existe, valida atributos y membresías sin cambiar su contraseña. La contraseña inicial procede de `DATABASE_URL`, se envía como parámetro transaccional y no aparece en el SQL construido por Node ni en logs de la aplicación. Una rotación futura será una operación explícita y coordinada con el pooler, no un efecto de ejecutar migraciones. El rol migrador debe ser distinto y tener permisos para crear roles, extensiones, esquemas y objetos.
+
+Orden:
+
+1. `001_postgis.sql`: esquemas, comprobación estricta de la ubicación de PostGIS y privilegios base.
+2. `002_territory.sql`: ciudades, zonas, nodos, segmentos, índices y validadores geográficos.
+3. `003_operations.sql`: versiones de red y auditoría append-only.
+4. `004_seed_sevilla.sql`: Sevilla y tres áreas piloto aproximadas; no crea caminos ni tramos.
+5. `005_identity_access.sql`: identidad cifrada, roles, permisos, enlaces de un uso, sesiones, idempotencia, límites, outbox y funciones de mínimo privilegio.
+6. `006_auth_function_hardening.sql`: reemplaza de forma forward-only la verificación para calificar referencias PL/pgSQL ambiguas, conservando firma, bloqueos, auditoría y permisos.
+7. `007_email_delivery.sql`: añade leases, backoff, hash del identificador de proveedor y funciones de claim/complete/fail para el worker.
+8. `008_email_delivery_fail_closed.sql`: hace terminal cualquier lease caducado o resultado ambiguo y exige hash de proveedor en eventos enviados.
+
+La migración territorial usa las filas de ciudad como punto de serialización frente a cambios concurrentes del límite. Los segmentos bloquean primero todos sus nodos implicados en orden UUID y después las ciudades en orden UUID; zonas y nodos conservan el mismo orden estable para ciudades. Cualquier futura mutación geográfica debe realizar toda su lectura, validación y escritura en una única transacción y respetar el orden nodo → ciudad cuando intervengan ambos tipos.
+
+La quinta migración concede al runtime únicamente `EXECUTE` sobre cinco funciones públicas de aplicación. No concede `SELECT` ni DML sobre tablas privadas ni sobre la función interna de comparación fija de 32 bytes. Cada solicitud toma primero el advisory lock global de idempotencia y después el lock de correo. Correo y red consumen sus límites independientemente; solo entonces se reserva capacidad global. Un enlace nuevo revoca los anteriores y cancela sus mensajes pendientes. La verificación localiza primero por el UUID visible, toma el lock de correo y solo después bloquea y revalida la fila; éxito, revocación o quinto fallo cancelan el outbox pendiente. La verificación, el rol inicial, la creación de sesión y cada revocación automática generan auditoría sin datos sensibles. La concurrencia entre dos conexiones no se considera verificada hasta una prueba real autorizada; la suite local comprueba estáticamente el orden de locks.
+
+La séptima migración usa `FOR UPDATE SKIP LOCKED` e incrementa el intento al reclamar. La octava conserva 007 inmutable y cambia la recuperación: un lease caducado se marca `failed/PROVIDER_OUTCOME_UNKNOWN`, nunca vuelve a `pending`. También impide `sent` sin hash de proveedor. El runtime solo puede ejecutar las tres funciones de entrega y no obtiene `SELECT` ni DML sobre el outbox. Éxito, reintento, fallo terminal y cancelación generan auditoría sin destinatario, token, enlace ni identificador externo en claro.
+
+El servidor nunca ejecuta migraciones al arrancar. Las ocho versiones están aplicadas; la repetición verificó cero cambios. La exclusión con dos conexiones reales sigue NO VERIFICADA; las pruebas con rollback sí cubren claim activo y recuperación terminal de lease.
