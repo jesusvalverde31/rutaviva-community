@@ -1,6 +1,7 @@
 name: Publish verified source tree
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - rutaviva-upload-b26-f3bd3d8.zip
@@ -19,6 +20,7 @@ jobs:
           unzip -o rutaviva-upload-b26-f3bd3d8.zip
           rm -f rutaviva-upload-b26-f3bd3d8.zip
           rm -f .github/workflows/bootstrap.yml
+          rm -f .github/workflows/ci.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
