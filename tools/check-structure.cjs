@@ -44,6 +44,7 @@ const required = [
   , 'public/contribution-recovery.mjs'
   , 'test/contributions.test.cjs', 'test/contributions.integration.test.cjs'
   , 'test/moderation.test.cjs', 'test/deployment.test.cjs', 'test/load.test.cjs'
+  , 'test/grant-role.test.cjs'
 ];
 
 const secretPatterns = [
