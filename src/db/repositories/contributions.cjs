@@ -3,10 +3,12 @@
 const { AppError } = require('../../errors.cjs');
 
 const SQL = Object.freeze({
-  list: 'SELECT * FROM app_private.list_contributions($1::uuid,$2::text,$3::text,$4::text,$5::integer)',
-  get: 'SELECT * FROM app_private.get_contribution($1::uuid,$2::uuid)',
-  create: 'SELECT * FROM app_private.create_contribution($1::uuid,$2::uuid,$3::uuid,$4::uuid,$5::text,$6::text,$7::text,$8::jsonb,$9::uuid)',
-  update: 'SELECT * FROM app_private.update_contribution($1::uuid,$2::uuid,$3::bigint,$4::text,$5::text,$6::jsonb,$7::uuid)',
+  list: 'SELECT * FROM app_private.list_accessibility_contributions($1::uuid,$2::text,$3::text,$4::text,$5::text,$6::text,$7::text,$8::integer)',
+  get: 'SELECT * FROM app_private.get_accessibility_contribution($1::uuid,$2::uuid)',
+  create: 'SELECT * FROM app_private.create_accessibility_contribution($1::uuid,$2::uuid,$3::uuid,$4::uuid,$5::text,$6::text,$7::text,$8::jsonb,$9::text,$10::text[],$11::date,$12::text,$13::text,$14::integer,$15::boolean,$16::uuid)',
+  createLegacy: 'SELECT * FROM app_private.create_contribution($1::uuid,$2::uuid,$3::uuid,$4::uuid,$5::text,$6::text,$7::text,$8::jsonb,$9::uuid)',
+  update: 'SELECT * FROM app_private.update_accessibility_contribution($1::uuid,$2::uuid,$3::bigint,$4::text,$5::text,$6::text,$7::jsonb,$8::text,$9::text[],$10::date,$11::text,$12::text,$13::integer,$14::boolean,$15::uuid)',
+  updateLegacy: 'SELECT * FROM app_private.update_contribution($1::uuid,$2::uuid,$3::bigint,$4::text,$5::text,$6::jsonb,$7::uuid)',
   transition: 'SELECT * FROM app_private.transition_own_contribution($1::uuid,$2::uuid,$3::bigint,$4::text,$5::uuid)',
   react: 'SELECT * FROM app_private.set_contribution_reaction($1::uuid,$2::uuid,$3::text,$4::boolean,$5::uuid)',
   activity: 'SELECT * FROM app_private.community_activity()',
@@ -30,10 +32,12 @@ function createContributionsRepository(database) {
     try { return (await database.query(sql, values)).rows; } catch (error) { return mapContributionError(error); }
   };
   return {
-    list: input => query(SQL.list, [input.sessionId || null, input.q || null, input.status || null, input.kind || null, input.limit || 50]),
+    list: input => query(SQL.list, [input.sessionId || null, input.q || null, input.status || null, input.kind || null, input.conditionType || null, input.lifecycle || null, input.affectedGroup || null, input.limit || 50]),
     get: input => query(SQL.get, [input.sessionId || null, input.id]).then(rows => rows[0]),
-    create: input => query(SQL.create, [input.sessionId, input.id, input.cityId, input.zoneId || null, input.kind, input.title, input.description || '', input.geometry, input.requestId]).then(rows => rows[0]),
-    update: input => query(SQL.update, [input.sessionId, input.id, input.version, input.title, input.description || '', input.geometry, input.requestId]).then(rows => rows[0]),
+    create: input => query(SQL.create, [input.sessionId, input.id, input.cityId, input.zoneId || null, input.kind, input.title, input.description || '', input.geometry, input.conditionType, input.affectedGroups, input.observedOn, input.permanence, input.measurementStatus, input.clearWidthCm ?? null, input.personalDataConfirmed, input.requestId]).then(rows => rows[0]),
+    createLegacy: input => query(SQL.createLegacy, [input.sessionId, input.id, input.cityId, input.zoneId || null, input.kind, input.title, input.description || '', input.geometry, input.requestId]).then(rows => rows[0]),
+    update: input => query(SQL.update, [input.sessionId, input.id, input.version, input.kind, input.title, input.description || '', input.geometry, input.conditionType, input.affectedGroups, input.observedOn, input.permanence, input.measurementStatus, input.clearWidthCm ?? null, input.personalDataConfirmed, input.requestId]).then(rows => rows[0]),
+    updateLegacy: input => query(SQL.updateLegacy, [input.sessionId, input.id, input.version, input.title, input.description || '', input.geometry, input.requestId]).then(rows => rows[0]),
     transition: input => query(SQL.transition, [input.sessionId, input.id, input.version, input.action, input.requestId]).then(rows => rows[0]),
     react: input => query(SQL.react, [input.sessionId, input.id, input.reaction || null, input.remove === true, input.requestId]).then(rows => rows[0]),
     activity: () => query(SQL.activity, []),
