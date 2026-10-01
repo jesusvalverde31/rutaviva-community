@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Mapa comunitario moderado de atajos y caminos peatonales de Sevilla.">
+  <meta name="description" content="Mapa comunitario moderado de barreras urbanas y movilidad peatonal inclusiva en Sevilla.">
   <meta name="theme-color" content="#15342d">
   <meta property="og:title" content="RutaViva Community Sevilla">
-  <meta property="og:description" content="Rutas peatonales explicables con conocimiento vecinal revisado y datos abiertos.">
+  <meta property="og:description" content="Barreras urbanas observadas, revisión humana y rutas orientativas con menos obstáculos conocidos.">
   <meta property="og:type" content="website">
   <title>RutaViva Community Sevilla</title>
   <link rel="stylesheet" href="/vendor/maplibre/maplibre-gl.css">
@@ -22,7 +22,7 @@
   <aside class="safety-banner">Ruta orientativa: comprueba siempre el entorno y la señalización.</aside>
   <main id="contenido" tabindex="-1">
     <section class="hero" aria-labelledby="hero-title">
-      <div><p class="eyebrow">Sevilla · mapa comunitario moderado</p><h1 id="hero-title">Los caminos que conoce el barrio.</h1><p class="lead">Consulta rutas peatonales explicables, comparte un atajo o una barrera real y mejora el mapa con información revisada por personas.</p><p class="hero-actions"><a class="button-link" href="#explorar">Calcular una ruta</a><a class="button-link secondary-link" href="#aportar">Proponer una mejora</a></p></div>
+      <div><p class="eyebrow">Sevilla · accesibilidad urbana comunitaria</p><h1 id="hero-title">Una ciudad más fácil de recorrer para todas las personas.</h1><p class="lead">Comunica obstáculos y zonas deterioradas, consulta información revisada y compara una ruta orientativa con menos barreras conocidas.</p><p class="hero-actions"><a class="button-link" href="#aportar">Comunicar una barrera</a><a class="button-link secondary-link" href="#explorar">Ver mapa de accesibilidad</a></p></div>
       <div class="hero-stat"><strong id="hero-published">0</strong><span>aportaciones publicadas</span></div>
     </section>
     <section id="confianza" class="section" aria-labelledby="trust-title">
@@ -38,15 +38,15 @@
     <section class="section" aria-labelledby="works-title">
       <div class="section-heading"><div><p class="eyebrow">De la calle al mapa</p><h2 id="works-title">Cómo funciona en tres pasos</h2></div></div>
       <ol class="feature-steps">
-        <li><strong>1. Una persona aporta.</strong><span>Señala un atajo, camino accesible, barrera, cierre o problema de iluminación que ha observado.</span></li>
-        <li><strong>2. Otra persona revisa.</strong><span>La moderación comprueba la descripción y el dibujo. Nadie puede aprobar su propia aportación.</span></li>
-        <li><strong>3. RutaViva lo explica.</strong><span>Solo la información publicada y vigente puede influir en el cálculo, que muestra distancia, cobertura y avisos.</span></li>
+        <li><strong>1. Una persona observa.</strong><span>Describe una condición física concreta, cuándo la vio y a quién podría dificultar el paso, sin identificar a nadie.</span></li>
+        <li><strong>2. Otra persona revisa.</strong><span>La moderación contrasta ubicación, vigencia y evidencia. Publicada no significa certificada y nadie aprueba su propia aportación.</span></li>
+        <li><strong>3. RutaViva lo explica.</strong><span>Solo la información publicada y abierta puede penalizar una ruta. Sin medición suficiente no se declara un paso imposible.</span></li>
       </ol>
     </section>
     <section id="explorar" class="section" aria-labelledby="explore-title">
       <div class="section-heading"><div><p class="eyebrow">Mapa vivo</p><h2 id="explore-title">Explorar aportaciones</h2></div><p id="contributions-status" class="status" role="status" aria-live="polite"></p></div>
       <form id="route-planner" class="route-planner" aria-describedby="route-guidance route-warning">
-        <fieldset id="route-fieldset" aria-busy="false"><legend>Planifica tu ruta</legend>
+        <fieldset id="route-fieldset" aria-busy="false"><legend>Planifica una ruta con menos barreras conocidas</legend>
           <p id="route-guidance">Elige cada punto en el mapa o usa el centro visible. El cálculo no guarda tu búsqueda.</p>
           <div class="route-point-grid">
             <div><strong>A · Origen</strong><output id="route-origin">Sin elegir</output><button type="button" data-route-map="origin">Elegir en mapa</button><button class="secondary" type="button" data-route-center="origin">Usar centro</button></div>
@@ -64,12 +64,15 @@
       <form id="filters" class="filters" role="search">
         <label>Buscar<input id="search" name="q" type="search" maxlength="80" placeholder="Zona, título o descripción"></label>
         <label>Estado<select id="status-filter" name="status"><option value="">Todas</option><option value="submitted">Pendientes</option><option value="under_review">En revisión</option><option value="published">Publicadas</option></select></label>
-        <label>Tipo<select id="kind-filter" name="kind"><option value="">Todos</option><option value="shortcut">Atajo</option><option value="accessible">Camino accesible</option><option value="barrier">Barrera</option><option value="closure">Cierre</option><option value="lighting">Iluminación</option></select></label>
+        <label>Familia<select id="kind-filter" name="kind"><option value="">Todas</option><option value="barrier">Barreras</option><option value="closure">Cierres</option><option value="lighting">Iluminación</option><option value="accessible">Condición favorable</option><option value="shortcut">Atajo histórico</option></select></label>
+        <label>Condición<select id="condition-filter" name="conditionType"><option value="">Todas</option><option value="narrow_passage">Paso estrecho</option><option value="step_or_curb">Escalón o bordillo</option><option value="damaged_surface">Pavimento deteriorado</option><option value="difficult_slope">Pendiente difícil</option><option value="orientation">Orientación o percepción</option><option value="crossing">Cruce problemático</option><option value="temporary_block">Bloqueo temporal</option><option value="poor_lighting">Iluminación deficiente</option><option value="favorable_segment">Tramo favorable observado</option><option value="other">Otra condición</option></select></label>
+        <label>Vigencia<select id="lifecycle-filter" name="lifecycle"><option value="">Abiertas y resueltas</option><option value="open">Abiertas</option><option value="resolved">Resueltas</option></select></label>
+        <label>Puede afectar a<select id="affected-filter" name="affectedGroup"><option value="">Cualquier grupo</option><option value="wheelchair">Personas usuarias de silla de ruedas</option><option value="reduced_mobility">Movilidad reducida</option><option value="visual">Personas ciegas o con baja visión</option><option value="older_people">Personas mayores</option><option value="stroller">Familias con carrito</option><option value="general">Peatones en general</option></select></label>
         <button type="submit">Buscar</button><button id="clear-filters" class="secondary" type="button">Limpiar</button>
       </form>
       <div class="explore-layout">
         <div class="list-pane"><ul id="contributions-list" class="contribution-list" aria-busy="true"></ul><button id="contributions-retry" class="secondary" hidden>Reintentar</button></div>
-        <div class="map-wrap"><div id="map" aria-label="Mapa de aportaciones de Sevilla"></div><p id="map-status" class="map-status" role="status">Cargando mapa…</p></div>
+        <div class="map-wrap"><div id="map" aria-label="Mapa de aportaciones de Sevilla"></div><aside class="map-legend" aria-label="Leyenda del mapa"><strong>Estado:</strong> O observada · P publicada · M medida · R resuelta</aside><p id="map-status" class="map-status" role="status">Cargando mapa…</p></div>
       </div>
     </section>
     <section id="zonas" class="section" aria-labelledby="zones-title">
@@ -90,13 +93,13 @@
       <div class="section-heading"><div><p class="eyebrow">Diseñada para personas</p><h2 id="people-title">La misma ciudad, necesidades distintas</h2></div></div>
       <div class="profiles">
         <article class="profile-card"><h3>Personas mayores</h3><p>Pasos grandes, instrucciones escritas y alternativas cuando manejar el mapa resulta difícil.</p></article>
-        <article class="profile-card"><h3>Familias y peatones</h3><p>Información vecinal revisada sobre cierres, iluminación y caminos cotidianos.</p></article>
-        <article class="profile-card"><h3>Movilidad reducida</h3><p>Una alternativa que evita barreras conocidas y declara qué porcentaje de accesibilidad está confirmado.</p></article>
+        <article class="profile-card"><h3>Personas ciegas o con baja visión</h3><p>Información textual sobre obstáculos, orientación, cruces e iluminación, sin depender únicamente del color o del mapa.</p></article>
+        <article class="profile-card"><h3>Movilidad reducida</h3><p>Una alternativa que reduce barreras conocidas y declara qué porcentaje del recorrido dispone de información.</p></article>
       </div>
     </section>
     <section class="section" aria-labelledby="pulse-title">
       <div class="section-heading"><div><p class="eyebrow">Pulso del piloto</p><h2 id="pulse-title">Actividad reciente protegida</h2></div><p id="pulse-status" class="status" role="status"></p></div>
-      <div class="trust-grid pulse-grid"><article class="trust-card"><strong id="pulse-7">…</strong><span>acciones en 7 días</span></article><article class="trust-card"><strong id="pulse-30">…</strong><span>acciones en 30 días</span></article></div>
+      <div class="trust-grid pulse-grid"><article class="trust-card"><strong id="pulse-7">…</strong><span>casos revisados en 7 días</span></article><article class="trust-card"><strong id="pulse-30">…</strong><span>casos revisados en 30 días</span></article></div>
     </section>
     <section class="section" aria-labelledby="activity-title">
       <div class="section-heading"><div><p class="eyebrow">Últimos siete días</p><h2 id="activity-title">Actividad comunitaria</h2></div><p id="activity-status" class="status"></p></div>
@@ -123,7 +126,7 @@
       <div class="help-topics">
         <details>
           <summary>1. Explorar el mapa y usar los filtros</summary>
-          <div class="help-answer"><p>En <a href="#explorar">Explorar</a> puedes buscar por zona, título o descripción. También puedes combinar los filtros de estado y tipo. Pulsa <strong>Buscar</strong> para aplicarlos y <strong>Limpiar</strong> para volver a ver todo.</p><p>Cada aportación de la lista incluye <strong>Ver en mapa</strong> para localizar su dibujo y <strong>Ver historial</strong> para consultar sus cambios. El mapa y la lista muestran la misma información; si el mapa te resulta difícil, puedes usar la lista y el historial.</p></div>
+          <div class="help-answer"><p>En <a href="#explorar">Explorar</a> puedes buscar por zona, título o descripción. Combina estado, familia, condición, vigencia y grupo potencialmente afectado. Pulsa <strong>Buscar</strong> para aplicarlos y <strong>Limpiar</strong> para volver a ver todo.</p><p>Cada ficha indica con texto si está observada, medida, publicada o resuelta. Incluye <strong>Ver en mapa</strong> y <strong>Ver historial</strong>. Si el mapa te resulta difícil, usa la lista: contiene la información equivalente.</p></div>
         </details>
         <details>
           <summary>2. Calcular una ruta de A a B</summary>
@@ -135,7 +138,7 @@
         </details>
         <details>
           <summary>4. Crear una aportación útil</summary>
-          <div class="help-answer"><p>En <a href="#aportar">Aportar</a>, elige qué ocurre y la zona. Escribe un título claro y explica solo hechos que hayas comprobado. Evita nombres, teléfonos, matrículas, fotografías de personas u otros datos privados.</p><p>La aportación se enviará a moderación. No cambiará ninguna ruta hasta que otra persona la revise y publique.</p></div>
+          <div class="help-answer"><p>En <a href="#aportar">Aportar</a>, elige la condición observable, cuándo la viste, su permanencia y a quién podría dificultar el paso. No preguntamos por tu discapacidad ni guardamos ese dato. Evita nombres, teléfonos, matrículas, fotografías u otros datos privados.</p><p>Si mediste una anchura, indica que está medida; si calculaste a ojo, marca estimada. La aportación se enviará a moderación y no cambiará ninguna ruta hasta publicarse.</p></div>
         </details>
         <details>
           <summary>5. Señalar un punto o dibujar un camino</summary>
@@ -155,7 +158,7 @@
         </details>
         <details>
           <summary>9. Ejemplo completo: informar de una barrera</summary>
-          <div class="help-answer"><ol><li>Comprueba la barrera desde un lugar seguro y recuerda la ubicación.</li><li>Entra con tu enlace mágico y abre <a href="#aportar">Aportar</a>.</li><li>Elige <strong>Barrera</strong>, selecciona la zona y escribe qué encontrará una persona.</li><li>Señala el punto en el mapa, revisa que no incluyes datos personales y envía.</li><li>La aportación queda pendiente. Otra cuenta moderadora la revisa y decide con un motivo registrado.</li><li>Si se publica y sigue vigente, el planificador puede evitar ese tramo en la opción accesible.</li></ol></div>
+          <div class="help-answer"><ol><li>Comprueba la condición desde un lugar seguro y recuerda la ubicación.</li><li>Entra con tu enlace mágico y abre <a href="#aportar">Aportar</a>.</li><li>Elige <strong>Paso estrecho</strong> y explica de forma neutral: “Posible estrechamiento por estructuras metálicas; pendiente de medir”.</li><li>Indica a quién podría afectar, la fecha y si parece permanente. No afirmes que sea inaccesible si no lo has medido.</li><li>Señala el punto o usa el centro visible, confirma que no incluyes datos personales y envía.</li><li>Otra cuenta moderadora revisa la aportación. Si se publica sin medición, puede penalizar una ruta, pero no excluirla.</li></ol></div>
         </details>
       </div>
 
@@ -186,19 +189,23 @@
       <aside class="help-safety" aria-labelledby="safety-title"><h3 id="safety-title">Privacidad y seguridad</h3><p>No publiques datos personales ni entres en zonas peligrosas para comprobar un camino. RutaViva ofrece una <strong>ruta orientativa</strong>: sigue siempre la señalización, las normas y tu propio criterio.</p></aside>
     </section>
     <section id="aportar" class="section card" aria-labelledby="contribute-title">
-      <p class="eyebrow">Tu conocimiento cuenta</p><h2 id="contribute-title" tabindex="-1">Aportar un punto o camino</h2>
-      <p>Se enviará a moderación y no cambiará ninguna ruta hasta publicarse.</p>
+      <p class="eyebrow">Tu observación cuenta</p><h2 id="contribute-title" tabindex="-1">Comunicar una barrera</h2>
+      <p>Describe hechos observables. Se enviará a moderación y no cambiará ninguna ruta hasta publicarse.</p>
       <form id="contribution-form" novalidate>
-        <div class="form-grid"><label>Qué ocurre<select id="contribution-kind" required><option value="shortcut">Atajo útil</option><option value="accessible">Camino accesible</option><option value="barrier">Barrera</option><option value="closure">Cierre temporal</option><option value="lighting">Iluminación deficiente</option></select></label><label>Zona<select id="contribution-zone"><option value="">Sin zona concreta</option></select></label></div>
-        <label>Título<input id="contribution-title" required minlength="5" maxlength="80" placeholder="Ej. Paso peatonal junto al parque"></label>
-        <label>Descripción<textarea id="contribution-description" maxlength="500" rows="3" placeholder="Describe lo que una persona encontrará"></textarea></label>
+        <div class="form-grid"><label>Familia<select id="contribution-kind" required><option value="barrier">Barrera u obstáculo</option><option value="closure">Cierre temporal</option><option value="lighting">Iluminación deficiente</option><option value="accessible">Condición favorable observada</option><option value="shortcut">Atajo (categoría histórica)</option></select></label><label>Condición observable<select id="contribution-condition" required><option value="narrow_passage">Paso estrecho</option><option value="step_or_curb">Escalón o falta de rebaje</option><option value="damaged_surface">Pavimento deteriorado</option><option value="difficult_slope">Pendiente o rampa difícil</option><option value="orientation">Orientación o percepción deficiente</option><option value="crossing">Cruce problemático</option><option value="temporary_block">Obra o bloqueo temporal</option><option value="poor_lighting">Iluminación insuficiente</option><option value="favorable_segment">Tramo favorable observado</option><option value="other">Otro problema peatonal</option></select></label><label>Zona<select id="contribution-zone"><option value="">Sin zona concreta</option></select></label></div>
+        <label>Título<input id="contribution-title" required minlength="5" maxlength="80" placeholder="Ej. Estructuras metálicas estrechan el paso"></label>
+        <label>Descripción y referencia del lugar<textarea id="contribution-description" maxlength="500" rows="4" placeholder="Describe hechos visibles y cómo localizar el punto, sin datos personales"></textarea></label>
+        <div class="form-grid"><label>Fecha aproximada en que lo viste<input id="contribution-observed" type="date" required></label><label>Permanencia<select id="contribution-permanence" required><option value="unknown">No lo sé</option><option value="permanent">Parece permanente</option><option value="temporary">Parece temporal</option></select></label><label>Anchura<select id="contribution-measurement" required><option value="unmeasured">No medida</option><option value="estimated">Estimada</option><option value="measured">Medida</option></select></label><label>Anchura libre en centímetros, opcional<input id="contribution-width" type="number" min="20" max="1000" inputmode="numeric" placeholder="Ej. 85"></label></div>
+        <fieldset><legend>¿A quién podría dificultar el paso? No indica nada sobre ti</legend><div class="check-grid"><label><input type="checkbox" name="affected" value="wheelchair"> Personas usuarias de silla de ruedas</label><label><input type="checkbox" name="affected" value="reduced_mobility"> Personas con movilidad reducida</label><label><input type="checkbox" name="affected" value="visual"> Personas ciegas o con baja visión</label><label><input type="checkbox" name="affected" value="older_people"> Personas mayores</label><label><input type="checkbox" name="affected" value="stroller"> Familias con carrito</label><label><input type="checkbox" name="affected" value="general"> Peatones en general</label></div></fieldset>
         <fieldset><legend>Dónde está</legend><div class="draw-actions"><button id="draw-start" type="button">Empezar dibujo</button><button id="draw-center" class="secondary" type="button">Añadir punto en el centro</button><button id="draw-undo" class="secondary" type="button">Deshacer</button><button id="draw-clear" class="secondary" type="button">Borrar</button></div><ol id="draw-points" class="points-list"></ol></fieldset>
+        <label class="confirm-row"><input id="personal-data-confirmed" type="checkbox" required> Confirmo que el texto y la ubicación no contienen nombres, teléfonos, matrículas ni otros datos personales.</label>
         <p id="contribution-status" class="status" role="status" aria-live="polite"></p><button type="submit">Revisar y enviar</button>
       </form>
       <p id="contribution-login-note">Necesitas entrar para enviar una aportación.</p>
     </section>
     <section id="moderar" class="section" aria-labelledby="moderation-title" hidden>
       <div class="section-heading"><div><p class="eyebrow">Responsabilidad compartida</p><h2 id="moderation-title">Cola de moderación</h2></div><button id="moderation-refresh" class="secondary">Actualizar</button></div>
+      <aside class="moderation-criteria"><strong>Antes de publicar:</strong> comprueba condición observable, ubicación, fecha, ausencia de datos personales y nivel de medición. Publicada significa revisada, no certificada. Sin medición suficiente no debe presentarse como paso imposible.</aside>
       <p id="moderation-status" class="status" role="status"></p><ul id="moderation-list" class="contribution-list"></ul>
     </section>
     <section id="cuenta" class="section account-grid" aria-labelledby="account-heading">
