@@ -1,5 +1,15 @@
 # Modelo de datos
 
+## Red peatonal versionada
+
+`app.network_releases` identifica una importación OSM de una zona. `route_nodes.release_id` y `route_segments.release_id` aíslan sus datos y permiten publicar un release completo de forma atómica. El runtime no tiene `SELECT` directo sobre estas tablas: solo ejecuta `app_private.route_network_status()` y `app_private.get_route_network(...)`.
+
+Las aportaciones publicadas reciben `routing_valid_until` según su tipo. Solo influyen mientras estén vigentes y no tengan una disputa comunitaria suficiente. Puntos cercanos afectan un tramo dentro de un radio acotado; líneas deben solaparse de forma sustancial, no basta con tocarlo. La red se importa como un release nuevo y solo se publica dentro de una transacción completa.
+
+## Métricas públicas del piloto
+
+La migración 017 expone tres funciones `SECURITY DEFINER` de solo lectura para estadísticas generales, zonas y ventanas de actividad. Todas se restringen a la ciudad piloto de Sevilla. Cuando hay de uno a cuatro autores distintos, los recuentos y fechas se suprimen; con cero participantes se devuelve cero. El runtime conserva únicamente permiso `EXECUTE`, no lectura directa de las tablas.
+
 ## Estado implementado en el Bloque 22
 
 Las migraciones crean `extensions` para PostGIS, `app` para datos consumidos por la API y `app_private` para migraciones y auditoría. Están implementadas `cities`, `zones`, `route_nodes`, `route_segments`, `network_releases`, `schema_migrations` y `audit_events`. El seed incluye Sevilla y tres zonas aproximadas, sin nodos ni tramos.
