@@ -1,13 +1,13 @@
 # RutaViva Community Sevilla
 
-> **Estado actual:** beta comunitaria pública en [rutaviva-community-sevilla-jv31.onrender.com](https://rutaviva-community-sevilla-jv31.onrender.com), conectada a Supabase Free con PostgreSQL/PostGIS. El reenfoque de accesibilidad del Bloque 31 está aplicado y verificado en la base real, pero su publicación web continúa pendiente; el primer piloto con una aportación real todavía no se ha ejecutado.
+> **Estado actual:** beta comunitaria pública en [rutaviva-community-sevilla-jv31.onrender.com](https://rutaviva-community-sevilla-jv31.onrender.com), conectada a Supabase Free con PostgreSQL/PostGIS. El reenfoque de accesibilidad del Bloque 31 está aplicado, verificado y desplegado; el primer piloto con una aportación real todavía no se ha ejecutado.
 
 RutaViva Community es un piloto de accesibilidad urbana comunitaria para Sevilla. Permite comunicar barreras y zonas deterioradas, consultar observaciones revisadas y entender por qué una ruta orientativa intenta reducir obstáculos conocidos. Ninguna aportación influye en rutas públicas sin revisión.
 
 ## Estado verificable
 
 - **IMPLEMENTADO:** interfaz web responsive con MapLibre y alternativa textual; planificador A→B directo/accesible; motor Dijkstra explicable; red OSM versionada e importador transaccional; guía pública «Cómo usar RutaViva»; acceso sin contraseña; sesiones revocables; aportaciones Point/LineString; filtros; confianza determinista; reacciones; historial append-only; cola de moderación con control de versión; outbox cifrado y correo Brevo.
-- **VERIFICADO:** 22 migraciones aplicadas; release OSM `osm-20260930135906-3f4223ab` con 12.272 nodos y 27.620 tramos; 137/137 pruebas locales; 27/27 de integración real con rollback; resolución y reapertura idempotentes; proyección de vigencia y medición hacia rutas; `health`, `ready`, `bootstrap`, estadísticas y aportaciones en 200; portada revisada en navegador local. En producción, el Bloque 29 continúa verificado mediante los PR #2 y #3; la publicación del Bloque 31 sigue pendiente.
+- **VERIFICADO:** 22 migraciones aplicadas; release OSM `osm-20260930135906-3f4223ab` con 12.272 nodos y 27.620 tramos; 137/137 pruebas locales; 27/27 de integración real con rollback; resolución y reapertura idempotentes; proyección de vigencia y medición hacia rutas; `health`, `ready`, `bootstrap`, estadísticas y aportaciones en 200; portada revisada en navegador local y público. El Bloque 31 se publicó mediante la PR #4 y Render desplegó el commit `07ffd81`.
 - **PROPUESTO:** ejecutar el [primer piloto real documentado](docs/VALIDACION-PILOTO-REAL.md) con las dos cuentas autorizadas operadas por Jesús —separación técnica de funciones, no independencia humana—, realizar después una validación con personas distintas, auditar con lector de pantalla, añadir denuncias/apelaciones y ampliar progresivamente el piloto.
 - **NO VERIFICADO:** lector de pantalla real, carga sostenida multiusuario, recorrido comunitario completo con una aportación real publicada y respuesta operativa 24/7. El plan gratuito puede dormir o pausar servicios.
 
