@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Vulnerabilidad de seguridad
+    url: https://github.com/jesusvalverde31/rutaviva-community/security/advisories/new
+    about: Comunica vulnerabilidades de forma privada; no abras una incidencia pública.
