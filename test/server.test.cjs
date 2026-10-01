@@ -77,7 +77,7 @@ test('bootstrap y zones solo devuelven el contrato público', async () => {
     assert.equal(response.json().data.length, 1);
     assert.deepEqual(response.json().data[0].bbox, [-6.025, 37.372, -6, 37.402]);
     assert.equal(response.body.includes('boundary'), false);
-    assert.deepEqual(queries[1].values, ['sevilla', 'Triana', null, null, 2]);
+    assert.deepEqual(queries.find(call => Array.isArray(call.values) && call.values.length === 5)?.values, ['sevilla', 'Triana', null, null, 2]);
   });
 });
 
