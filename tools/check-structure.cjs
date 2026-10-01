@@ -57,6 +57,10 @@ const required = [
   , 'migrations/018_postgis_operator_resolution.sql'
   , 'migrations/019_route_network_capacity.sql'
   , 'migrations/020_snap_route_points_fields.sql'
+  , 'docs/VALIDACION-PILOTO-REAL.md'
+  , 'migrations/021_accessibility_focus.sql'
+  , 'migrations/022_route_network_operator_fix.sql'
+  , 'test/accessibility-focus.test.cjs'
 ];
 
 const secretPatterns = [
