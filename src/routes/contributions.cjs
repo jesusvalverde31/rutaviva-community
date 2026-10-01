@@ -11,18 +11,29 @@ const geometry = { oneOf: [
   { type: 'object', additionalProperties: false, required: ['type', 'coordinates'], properties: { type: { const: 'Point' }, coordinates: position } },
   { type: 'object', additionalProperties: false, required: ['type', 'coordinates'], properties: { type: { const: 'LineString' }, coordinates: { type: 'array', minItems: 2, maxItems: 50, items: position } } }
 ] };
+const CONDITION_TYPES = ['narrow_passage','step_or_curb','damaged_surface','difficult_slope','orientation','crossing','temporary_block','poor_lighting','favorable_segment','other'];
+const AFFECTED_GROUPS = ['wheelchair','reduced_mobility','visual','older_people','stroller','general'];
+const accessibilityProperties = {
+  conditionType: { type: 'string', enum: CONDITION_TYPES },
+  affectedGroups: { type: 'array', uniqueItems: true, maxItems: 6, items: { type: 'string', enum: AFFECTED_GROUPS } },
+  observedOn: { type: 'string', format: 'date' },
+  permanence: { type: 'string', enum: ['permanent','temporary','unknown'] },
+  measurementStatus: { type: 'string', enum: ['unmeasured','estimated','measured'] },
+  clearWidthCm: { anyOf: [{ type: 'integer', minimum: 20, maximum: 1000 }, { type: 'null' }] },
+  personalDataConfirmed: { type: 'boolean' }
+};
 const contributionBody = {
   type: 'object', additionalProperties: false, required: ['cityId', 'kind', 'title', 'geometry'],
   properties: {
     cityId: UUID, zoneId: { anyOf: [UUID, { type: 'null' }] },
     kind: { type: 'string', enum: ['shortcut', 'accessible', 'barrier', 'closure', 'lighting'] },
     title: { type: 'string', minLength: 5, maxLength: 80 },
-    description: { type: 'string', maxLength: 500, default: '' }, geometry
+    description: { type: 'string', maxLength: 500, default: '' }, geometry, ...accessibilityProperties
   }
 };
 const updateBody = {
   type: 'object', additionalProperties: false, required: ['version', 'title', 'geometry'],
-  properties: { version: { type: 'integer', minimum: 1 }, title: { type: 'string', minLength: 5, maxLength: 80 }, description: { type: 'string', maxLength: 500, default: '' }, geometry }
+  properties: { version: { type: 'integer', minimum: 1 }, kind: contributionBody.properties.kind, title: { type: 'string', minLength: 5, maxLength: 80 }, description: { type: 'string', maxLength: 500, default: '' }, geometry, ...accessibilityProperties }
 };
 const versionBody = { type: 'object', additionalProperties: false, required: ['version'], properties: { version: { type: 'integer', minimum: 1 } } };
 const reactionBody = { type: 'object', additionalProperties: false, required: ['reaction'], properties: { reaction: { type: 'string', enum: ['confirm', 'reject'] } } };
@@ -32,10 +43,32 @@ const listQuery = {
     q: { type: 'string', minLength: 1, maxLength: 80 },
     status: { type: 'string', enum: ['draft', 'submitted', 'under_review', 'published', 'rejected', 'withdrawn'] },
     kind: { type: 'string', enum: ['shortcut', 'accessible', 'barrier', 'closure', 'lighting'] },
+    conditionType: { type: 'string', enum: CONDITION_TYPES },
+    lifecycle: { type: 'string', enum: ['open','resolved'] },
+    affectedGroup: { type: 'string', enum: AFFECTED_GROUPS },
     limit: { type: 'integer', minimum: 1, maximum: 100, default: 50 }
   }
 };
 const createHeaders = { type: 'object', required: ['idempotency-key'], properties: { 'idempotency-key': { type: 'string', format: 'uuid' } } };
+
+function validateAccessibilityBody(body) {
+  const required = ['kind','conditionType','affectedGroups','observedOn','permanence','measurementStatus','personalDataConfirmed'];
+  if (required.some(key => body[key] === undefined) || body.personalDataConfirmed !== true) {
+    throw new AppError(422, 'ACCESSIBILITY_DETAILS_REQUIRED', 'Completa la observación y confirma que no contiene datos personales.');
+  }
+  if (body.clearWidthCm != null && body.measurementStatus === 'unmeasured') {
+    throw new AppError(422, 'MEASUREMENT_INVALID', 'Indica si la anchura es estimada o medida.');
+  }
+  const type = body.geometry?.type;
+  const coherent = body.conditionType === 'favorable_segment'
+    ? body.kind === 'accessible' && type === 'LineString'
+    : body.conditionType === 'poor_lighting'
+      ? body.kind === 'lighting' && type === 'Point'
+      : body.conditionType === 'temporary_block'
+        ? body.kind === 'closure' && type === 'Point'
+        : body.kind === 'barrier' && type === 'Point';
+  if (!coherent) throw new AppError(422, 'ACCESSIBILITY_COMBINATION_INVALID', 'La condición, su categoría y la geometría no son coherentes.');
+}
 
 function contributionsRoutes(app, options) {
   const { repository, authService, config } = options;
@@ -66,12 +99,24 @@ function contributionsRoutes(app, options) {
   });
   app.post('/api/v1/contributions', { schema: { headers: createHeaders, body: contributionBody } }, async (request, reply) => {
     requireRepository(); const actor = auth(request);
-    const result = await repository.create({ sessionId: actor.session_id, id: request.headers['idempotency-key'], ...request.body, requestId: request.id });
+    const hasAccessibilityDetails = request.body.conditionType !== undefined;
+    if (!hasAccessibilityDetails && request.body.kind !== 'shortcut') {
+      throw new AppError(422, 'ACCESSIBILITY_DETAILS_REQUIRED', 'Las nuevas observaciones deben incluir condición, fecha, evidencia y confirmación de privacidad.');
+    }
+    if (hasAccessibilityDetails) validateAccessibilityBody(request.body);
+    const create = hasAccessibilityDetails ? repository.create : (repository.createLegacy || repository.create);
+    const result = await create({ sessionId: actor.session_id, id: request.headers['idempotency-key'], ...request.body, requestId: request.id });
     reply.code(201); return { contribution: { id: result.id, status: result.status, version: Number(result.version) }, requestId: request.id };
   });
   app.patch('/api/v1/contributions/:id', { schema: { params: idParams, body: updateBody } }, async request => {
     requireRepository(); const actor = auth(request);
-    const result = await repository.update({ sessionId: actor.session_id, id: request.params.id, ...request.body, requestId: request.id });
+    const hasAccessibilityDetails = request.body.conditionType !== undefined;
+    if (hasAccessibilityDetails) validateAccessibilityBody(request.body);
+    else if (request.body.kind !== undefined || Object.keys(accessibilityProperties).some(key => request.body[key] !== undefined)) {
+      throw new AppError(422, 'ACCESSIBILITY_DETAILS_REQUIRED', 'Para corregir una observación completa todos sus datos estructurados.');
+    }
+    const update = hasAccessibilityDetails ? repository.update : (repository.updateLegacy || repository.update);
+    const result = await update({ sessionId: actor.session_id, id: request.params.id, ...request.body, requestId: request.id });
     return { contribution: { ...result, version: Number(result.version) }, requestId: request.id };
   });
   for (const action of ['submit', 'withdraw']) app.post(`/api/v1/contributions/:id/${action}`, { schema: { params: idParams, body: versionBody } }, async request => {
@@ -91,4 +136,4 @@ function contributionsRoutes(app, options) {
   });
 }
 
-module.exports = { contributionBody, contributionsRoutes, geometry, listQuery };
+module.exports = { AFFECTED_GROUPS, CONDITION_TYPES, contributionBody, contributionsRoutes, geometry, listQuery, updateBody, validateAccessibilityBody };

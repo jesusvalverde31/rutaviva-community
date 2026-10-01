@@ -1,5 +1,11 @@
 # Presentación de RutaViva Community Sevilla
 
+## Propuesta principal actual
+
+RutaViva convierte observaciones ciudadanas sobre barreras y deterioro peatonal en información estructurada, moderada y explicable. Una entidad puede visualizar problemas abiertos, priorizar comprobaciones y mostrar recorridos orientativos con menos barreras conocidas. El sistema no certifica accesibilidad ni sustituye una auditoría técnica.
+
+Destinatarios potenciales: ayuntamientos, empresas de mantenimiento urbano, asociaciones vecinales y organizaciones de accesibilidad como ONCE. Esta enumeración no implica relación, aval ni colaboración actual.
+
 ## Explicación en una frase
 
 RutaViva es una aplicación web que combina una red peatonal abierta con conocimiento vecinal moderado para proponer rutas directas y alternativas con menos barreras conocidas, explicando siempre por qué recomienda cada recorrido.
@@ -11,9 +17,9 @@ Los mapas generalistas conocen calles, pero no siempre reflejan un cierre recien
 ## Cómo funciona, explicado de forma sencilla
 
 1. Cualquier persona puede consultar el mapa y calcular una ruta sin crear una cuenta.
-2. El usuario elige un origen A y un destino B. RutaViva calcula la opción de menor distancia y, si es diferente, otra que evita barreras e incidencias conocidas.
+2. El usuario elige un origen A y un destino B. RutaViva calcula la opción de menor distancia y, si es diferente, otra que reduce barreras e incidencias conocidas.
 3. El resultado muestra metros, tiempo estimado, puntuación, cobertura de accesibilidad, factores principales, avisos y un recorrido textual.
-4. Una persona registrada puede aportar un atajo, camino accesible, barrera, cierre o problema de iluminación.
+4. Una persona registrada puede comunicar una barrera, deterioro, cierre, cruce, problema de orientación o iluminación, indicando evidencia y vigencia. Los atajos históricos siguen visibles como categoría secundaria.
 5. La aportación no modifica rutas inmediatamente. Otra cuenta autorizada debe revisarla y publicar o rechazarla con un motivo.
 6. Las personas pueden confirmar o rechazar información publicada. Las discrepancias suficientes impiden que esa aportación siga influyendo en el cálculo.
 7. Los cierres y demás incidencias caducan según su tipo para reducir el riesgo de utilizar información antigua.
@@ -32,13 +38,17 @@ Los mapas generalistas conocen calles, pero no siempre reflejan un cierre recien
 3. En el mapa, selecciona A y B y calcula una ruta. Compara la directa con la alternativa accesible y lee un factor y un aviso.
 4. Abre los filtros y muestra que mapa y lista ofrecen información equivalente.
 5. Entra con un enlace mágico. No hay contraseña que recordar ni almacenar.
-6. Crea una aportación de demostración sin publicarla todavía. Señala cómo se guarda con reintento seguro y pasa a moderación.
-7. Con otra cuenta, toma el caso y explica la prohibición de auto-revisión.
+6. Usa el caso real previamente confirmado y créalo sin publicarlo todavía. Señala cómo se guarda con reintento seguro y pasa a moderación.
+7. Con otra cuenta, toma el caso y explica la prohibición de que la misma cuenta revise su propia aportación.
 8. Termina en “Cómo usar” y “Metodología” para demostrar accesibilidad y transparencia.
+
+La primera demostración basada en un hecho de Sevilla debe seguir la [guía de validación del piloto real](VALIDACION-PILOTO-REAL.md). Esa guía separa técnicamente la cuenta autora de la moderadora, compara el mismo trayecto A/B antes y después y obliga a informar honestamente aunque la ruta no cambie. En el piloto inicial, Jesús opera ambas cuentas; la independencia humana solo podrá afirmarse después de una validación futura con dos personas distintas. El caso real todavía está pendiente y no debe presentarse como ejecutado ni como prueba de seguridad.
+
+Si todavía no existe un caso real confirmado, no se crea contenido ficticio persistente en producción. Una demostración simulada solo puede hacerse en un entorno aislado de pruebas, con rollback o eliminación segura comprobada al terminar.
 
 ## Guion de 60 segundos
 
-“Las calles cambian más rápido que muchos mapas. RutaViva Community Sevilla convierte lo que sabe el barrio en rutas peatonales explicables. Cualquier persona elige origen y destino y compara la ruta directa con una alternativa que reduce barreras conocidas. La aplicación muestra distancia, tiempo, cobertura de accesibilidad y el motivo de cada recomendación. La comunidad puede proponer atajos, cierres o problemas de iluminación, pero nada influye en una ruta hasta superar una moderación independiente. Las incidencias caducan, las discrepancias se tienen en cuenta y las métricas protegen a grupos pequeños. Es una plataforma web accesible, con datos abiertos de OpenStreetMap, backend PostgreSQL/PostGIS y una arquitectura preparada para ampliar el piloto por barrios o ciudades.”
+“Las calles cambian más rápido que muchos mapas. RutaViva Community Sevilla transforma observaciones sobre barreras y deterioro peatonal en información estructurada y revisada. Cualquier persona compara una ruta directa con otra que reduce barreras conocidas y entiende distancia, cobertura y avisos. La comunidad describe condiciones del entorno, a quién podrían afectar y si existe una medición; nada influye hasta superar moderación independiente. Publicada no significa certificada y ninguna observación ciudadana bloquea automáticamente un tramo. Es una plataforma web accesible, con OpenStreetMap, PostgreSQL/PostGIS y arquitectura preparada para ampliar el piloto.”
 
 ## Qué demuestra técnicamente
 
@@ -46,7 +56,7 @@ Los mapas generalistas conocen calles, pero no siempre reflejan un cierre recien
 - PostgreSQL/PostGIS con migraciones incrementales, funciones de privilegio mínimo y publicación transaccional de red.
 - Cálculo de rutas determinista con cola de prioridad, perfil directo y perfil accesible.
 - Autenticación mediante enlaces mágicos, sesiones revocables, CSRF e idempotencia.
-- Moderación independiente, historial inmutable, reacciones y caducidad de incidencias.
+- Separación técnica entre cuenta autora y cuenta moderadora, historial inmutable, reacciones y caducidad de incidencias.
 - Rate limiting persistente con identificador de red derivado; no se conserva la IP en claro.
 - Caché acotada, ETag, métricas con privacidad mínima de cinco participantes y estados degradados honestos.
 - Interfaz responsive, navegación por teclado, foco visible, mensajes accesibles y alternativa textual al mapa y al gráfico.
@@ -82,7 +92,7 @@ Una implantación profesional futura podría incluir identidad institucional, pa
 
 **¿Puede ampliarse a otra ciudad?** La arquitectura está preparada para ciudades y zonas, pero cada despliegue necesita datos, límites, moderadores y validación local.
 
-**¿Cómo se evita información falsa?** No se publica automáticamente: hay moderación independiente, historial, confirmaciones, rechazo comunitario, caducidad y trazabilidad.
+**¿Cómo se evita información falsa?** No se publica automáticamente: hay moderación con otra cuenta autorizada, historial, confirmaciones, rechazo comunitario, caducidad y trazabilidad. En el piloto inicial Jesús opera las dos cuentas; la independencia humana queda pendiente de una prueba futura con personas distintas.
 
 **¿Guarda los recorridos consultados?** No. El cálculo recibe origen y destino para responder y no persiste la búsqueda por defecto.
 
@@ -92,4 +102,6 @@ Una implantación profesional futura podría incluir identidad institucional, pa
 
 ## Datos que todavía necesitamos del mundo real
 
-Para validar el ciclo completo hacen falta observaciones reales dentro del piloto: un atajo, barrera, cierre, problema de iluminación o camino accesible, con ubicación y descripción no sensible. Deben aportarse únicamente cuando la persona responsable confirme que son hechos observados y seguros de comunicar; nunca se inventan para una demostración pública.
+Para validar el ciclo completo hace falta una condición urbana real dentro del perímetro admitido, con ubicación, fecha, vigencia y descripción no sensible. Debe aportarse únicamente cuando la persona responsable confirme que es un hecho observado y seguro de comunicar; nunca se inventa para una demostración pública. Si queda fuera de la red vigente, valida el flujo comunitario pero no el cambio del cálculo A→B.
+
+El procedimiento, los datos necesarios, los criterios de aceptación y la plantilla de evidencia están en [Validación del primer piloto real](VALIDACION-PILOTO-REAL.md). Se recomienda —pendiente de confirmación— usar la cuenta personal como autora y la laboral como moderadora. Ambas las opera Jesús en este piloto, por lo que se valida separación técnica de funciones y no independencia humana.

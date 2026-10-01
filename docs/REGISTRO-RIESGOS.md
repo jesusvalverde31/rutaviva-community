@@ -1,5 +1,13 @@
 # Registro inicial de riesgos
 
+## Riesgos añadidos por el enfoque de accesibilidad
+
+- Una observación puede confundirse con una certificación: toda ficha y ruta distingue observada, medida, publicada y resuelta.
+- Una anchura estimada puede ser incorrecta: se etiqueta separadamente y no habilita exclusión automática.
+- Un punto puede quedar fuera de la red vigente: se admite como aportación de Sevilla, pero el planificador declara que hoy solo calcula sobre Casco Antiguo.
+- Una fotografía puede incluir personas o portales: no se almacenan fotografías en la v1.
+- El lenguaje puede estigmatizar: la interfaz describe condiciones del entorno, no capacidades personales.
+
 | Riesgo | Impacto | Mitigación propuesta | Estado |
 | --- | --- | --- | --- |
 | Ruta o incidencia incorrecta | Crítico | Moderación, caducidad, explicaciones y lenguaje orientativo | No verificado |

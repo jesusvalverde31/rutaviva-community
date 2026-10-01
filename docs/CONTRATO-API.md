@@ -1,5 +1,11 @@
 # Contrato API y hoja de ruta
 
+## Aportaciones de accesibilidad — Bloque 31
+
+`POST /api/v1/contributions` acepta de forma conjunta `conditionType`, `affectedGroups`, `observedOn`, `permanence`, `measurementStatus`, `clearWidthCm` y `personalDataConfirmed=true`. Solo un atajo histórico puede conservar el cuerpo anterior; cualquier nueva observación de accesibilidad exige el conjunto completo. `GET /api/v1/contributions` añade filtros combinables `conditionType`, `lifecycle` y `affectedGroup`. La respuesta sanitizada expone condición, grupos potencialmente afectados, medición y ciclo, pero nunca datos de identidad.
+
+`PATCH /api/v1/contributions/:id` corrige un borrador propio con control de versión. Para una observación accesible recibe juntos `kind`, geometría y todos los campos estructurados; el esquema es cerrado y la base vuelve a validar sus combinaciones. La interfaz web aún no incluye edición visual. `POST /api/v1/moderation/contributions/:id/resolve` y `/reopen` requieren `Idempotency-Key`, versión y motivo de 3 a 300 caracteres; replay exacto devuelve el mismo resultado, mientras reutilizar la clave con otro payload responde conflicto.
+
 ## `POST /api/v1/routes/search`
 
 Operación anónima y no persistente. Acepta exactamente `{origin:{latitude,longitude},destination:{latitude,longitude}}`, hasta 4 KB. Limita a 30 cálculos por red cada diez minutos. Devuelve `direct` y, cuando difiere y existe, `accessible`, con distancia, minutos, score, cobertura, GeoJSON, tramos, factores y avisos. Errores de negocio: `OUTSIDE_PILOT`, `NO_NEARBY_NETWORK`, `ORIGIN_DESTINATION_TOO_CLOSE`, `NO_ROUTE_FOUND` y `ROUTING_DATA_NOT_READY`; todos incluyen `requestId`.
@@ -54,7 +60,7 @@ Se diferencian `400`, `401`, `403`, `404`, `409`, `412`, `413`, `415`, `422`, `4
 
 En el Bloque 21, `/api/v1/health` confirma solo que el proceso responde. `/api/v1/ready` devuelve `503 SERVICE_NOT_READY` hasta que PostgreSQL y las migraciones estén disponibles. Correo y mapas serán degradables y no determinarán readiness.
 
-Desde el Bloque 29, `ready` exige el rol efectivo `rutaviva_runtime`, PostGIS en `extensions`, 22 relaciones requeridas, 26 funciones con permiso `EXECUTE` y coincidencia exacta de versión, nombre y checksum de las 20 migraciones locales. `bootstrap` devuelve servicio, versión, piloto, capacidades, enlaces y advertencia de ruta orientativa. `zones` admite `q`, cursor opaco base64url versionado y límite 1–100; ordena por `sort_order,id`, responde `data` y `page`, y expone solo `bbox`, nunca polígonos. Las consultas son parametrizadas. Si no hay base, los recursos dependientes responden un problema seguro, sin mensajes nativos del proveedor.
+Desde el Bloque 31, `ready` exige el rol efectivo `rutaviva_runtime`, PostGIS en `extensions`, 23 relaciones requeridas, 31 funciones con permiso `EXECUTE` y coincidencia exacta de versión, nombre y checksum de las 22 migraciones locales. `bootstrap` devuelve servicio, versión, piloto, capacidades, enlaces y advertencia de ruta orientativa. `zones` admite `q`, cursor opaco base64url versionado y límite 1–100; ordena por `sort_order,id`, responde `data` y `page`, y expone solo `bbox`, nunca polígonos. Las consultas son parametrizadas. Si no hay base, los recursos dependientes responden un problema seguro, sin mensajes nativos del proveedor.
 
 El Bloque 23 exige `Origin` exacto para mutaciones. `request-link` requiere `Idempotency-Key` de 16–128 caracteres; la clave tiene alcance global para ese endpoint, su repetición exacta devuelve el resultado guardado y su reutilización con otro correo devuelve `409`. Responde `202` cuando la solicitud puede procesarse, sin revelar cuentas. `verify` recibe el token que el frontend extraiga del fragmento URL; el fragmento no viaja en la petición inicial al servidor. Las rutas de sesión requieren cookie opaca y las mutaciones autenticadas requieren además `X-CSRF-Token`. Logout es idempotente y siempre exige Origin: con sesión válida exige CSRF y revoca; sin sesión válida limpia la cookie y devuelve `204`. Los objetos de usuario incluyen `version` para futuros cambios optimistas.
 

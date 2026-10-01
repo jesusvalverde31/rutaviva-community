@@ -42,7 +42,15 @@ function decorateContribution(row) {
     own: row.own === true,
     myReaction: row.my_reaction || row.myReaction || null,
     createdAt,
-    updatedAt: row.updated_at || row.updatedAt
+    updatedAt: row.updated_at || row.updatedAt,
+    conditionType: row.condition_type || row.conditionType || 'other',
+    affectedGroups: row.affected_groups || row.affectedGroups || [],
+    observedOn: row.observed_on || row.observedOn || null,
+    permanence: row.permanence || 'unknown',
+    measurementStatus: row.measurement_status || row.measurementStatus || 'unmeasured',
+    clearWidthCm: row.clear_width_cm ?? row.clearWidthCm ?? null,
+    lifecycle: row.lifecycle_status || row.lifecycle || 'open',
+    resolvedAt: row.resolved_at || row.resolvedAt || null
   };
 }
 

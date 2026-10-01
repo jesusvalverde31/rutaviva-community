@@ -1,5 +1,11 @@
 # Modelo de datos
 
+## Extensión de accesibilidad del Bloque 31
+
+`app.contributions` conserva `kind` y todos los registros históricos. La migración 021 añade `condition_type`, `affected_groups`, `observed_on`, `permanence`, `measurement_status`, `clear_width_cm`, `lifecycle_status`, `resolved_at` y `personal_data_confirmed`. `affected_groups` describe a quién podría afectar una condición, nunca la discapacidad del autor. La anchura es opcional y solo se admite como estimada o medida. `resolved` exige fecha de resolución. La aportación pública separa su estado editorial (`published`) de su vigencia física (`open/resolved`). `contribution_lifecycle_requests` conserva UUID de idempotencia, actor, acción, recurso, huella SHA-256 y resultado, sin almacenar el texto del motivo; permite replay exacto y detecta reutilización conflictiva.
+
+Taxonomía: `narrow_passage`, `step_or_curb`, `damaged_surface`, `difficult_slope`, `orientation`, `crossing`, `temporary_block`, `poor_lighting`, `favorable_segment` y `other`.
+
 ## Red peatonal versionada
 
 `app.network_releases` identifica una importación OSM de una zona. `route_nodes.release_id` y `route_segments.release_id` aíslan sus datos y permiten publicar un release completo de forma atómica. El runtime no tiene `SELECT` directo sobre estas tablas: solo ejecuta `app_private.route_network_status()` y `app_private.get_route_network(...)`.
@@ -77,4 +83,4 @@ El decaimiento es `2^(-edad/vida_media)`. Vidas medias iniciales: cierre o pelig
 
 `coste_tramo = distancia × (1 + barrera + iluminación + incidencias + incertidumbre)` y `score_ruta = clamp(0; 100; round(100 × distancia_base/coste_total))`. El riesgo combinado de incidencias es `min(0,90; 1 - producto(1 - riesgo_i × confianza_i × vigencia_i))`. Iluminación toma el mayor riesgo entre dato base y aviso vigente, sin doble suma.
 
-Una incompatibilidad de accesibilidad o cierre publicado excluye el tramo. La explicación mostrará distancia, cobertura, fecha y los tres factores dominantes. Menos del 80 % de atributos moderados genera aviso de datos insuficientes. Las estadísticas requieren al menos cinco personas por grupo y nunca muestran recorridos individuales.
+En el MVP, solo una barrera presente en la red base OSM puede excluir un tramo del perfil accesible. Una observación ciudadana publicada —incluso medida— puede penalizar y explicar una alternativa, pero nunca excluye automáticamente; una observación resuelta deja de penalizar. La explicación mostrará distancia, cobertura, fecha y los tres factores dominantes. Menos del 80 % de atributos moderados genera aviso de datos insuficientes. Las estadísticas requieren al menos cinco personas por grupo y nunca muestran recorridos individuales.
