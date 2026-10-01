@@ -1,15 +1,15 @@
 # RutaViva Community Sevilla
 
-> **Estado actual:** beta comunitaria pública en [rutaviva-community-sevilla-jv31.onrender.com](https://rutaviva-community-sevilla-jv31.onrender.com), conectada a Supabase Free con PostgreSQL/PostGIS. El cálculo A→B, la red peatonal real y la capa pública de credibilidad están verificados localmente contra Supabase y quedan pendientes de publicación en producción.
+> **Estado actual:** beta comunitaria pública en [rutaviva-community-sevilla-jv31.onrender.com](https://rutaviva-community-sevilla-jv31.onrender.com), conectada a Supabase Free con PostgreSQL/PostGIS. El reenfoque de accesibilidad del Bloque 31 está aplicado y verificado en la base real, pero su publicación web continúa pendiente; el primer piloto con una aportación real todavía no se ha ejecutado.
 
-RutaViva Community está diseñada como un piloto comunitario de rutas peatonales orientativas para Sevilla. Permitirá consultar recorridos, proponer caminos o incidencias y entender por qué una alternativa ha sido recomendada. Ninguna aportación influirá en rutas públicas sin revisión.
+RutaViva Community es un piloto de accesibilidad urbana comunitaria para Sevilla. Permite comunicar barreras y zonas deterioradas, consultar observaciones revisadas y entender por qué una ruta orientativa intenta reducir obstáculos conocidos. Ninguna aportación influye en rutas públicas sin revisión.
 
 ## Estado verificable
 
 - **IMPLEMENTADO:** interfaz web responsive con MapLibre y alternativa textual; planificador A→B directo/accesible; motor Dijkstra explicable; red OSM versionada e importador transaccional; guía pública «Cómo usar RutaViva»; acceso sin contraseña; sesiones revocables; aportaciones Point/LineString; filtros; confianza determinista; reacciones; historial append-only; cola de moderación con control de versión; outbox cifrado y correo Brevo.
-- **VERIFICADO:** 20 migraciones aplicadas; release OSM `osm-20260930135906-3f4223ab` con 12.272 nodos y 27.620 tramos; `npm run check`; 122/122 pruebas locales; 26/26 de integración real; tres rutas reales consecutivas respondidas; readiness, rol runtime, CSP, estados vacíos, guía accesible y navegación en navegador local.
-- **PROPUESTO:** publicar el Bloque 29 y comprobarlo en Render; después, recorrer una aportación real con las dos cuentas autorizadas, realizar auditoría con lector de pantalla, añadir denuncias/apelaciones y ampliar progresivamente el piloto.
-- **NO VERIFICADO:** lector de pantalla real, carga sostenida multiusuario, recorrido comunitario completo con una aportación real publicada, despliegue del Bloque 29 y respuesta operativa 24/7. El plan gratuito puede dormir o pausar servicios.
+- **VERIFICADO:** 22 migraciones aplicadas; release OSM `osm-20260930135906-3f4223ab` con 12.272 nodos y 27.620 tramos; 137/137 pruebas locales; 27/27 de integración real con rollback; resolución y reapertura idempotentes; proyección de vigencia y medición hacia rutas; `health`, `ready`, `bootstrap`, estadísticas y aportaciones en 200; portada revisada en navegador local. En producción, el Bloque 29 continúa verificado mediante los PR #2 y #3; la publicación del Bloque 31 sigue pendiente.
+- **PROPUESTO:** ejecutar el [primer piloto real documentado](docs/VALIDACION-PILOTO-REAL.md) con las dos cuentas autorizadas operadas por Jesús —separación técnica de funciones, no independencia humana—, realizar después una validación con personas distintas, auditar con lector de pantalla, añadir denuncias/apelaciones y ampliar progresivamente el piloto.
+- **NO VERIFICADO:** lector de pantalla real, carga sostenida multiusuario, recorrido comunitario completo con una aportación real publicada y respuesta operativa 24/7. El plan gratuito puede dormir o pausar servicios.
 
 ## Orden de lectura
 
@@ -25,6 +25,7 @@ RutaViva Community está diseñada como un piloto comunitario de rutas peatonale
 10. `docs/DECISIONES.md`
 11. `docs/DATOS-OSM.md`
 12. `docs/PRESENTACION-COMERCIAL.md`
+13. `docs/VALIDACION-PILOTO-REAL.md`
 
 ## Instalar, comprobar y abrir
 
@@ -82,10 +83,14 @@ Endpoints implementados:
 - `POST /api/v1/moderation/cases/:id/claim`
 - `POST /api/v1/moderation/cases/:id/publish`
 - `POST /api/v1/moderation/cases/:id/reject`
+- `POST /api/v1/moderation/contributions/:id/resolve`
+- `POST /api/v1/moderation/contributions/:id/reopen`
 - `GET /`
 - `GET /auth/verify`
 
 La autenticación usa tokens de un solo uso de 15 minutos, UUID público más 256 bits aleatorios, hashes persistidos, cifrado AES-256-GCM para correo y outbox, máximo cinco sesiones activas y cookies opacas. El worker reclama con `SKIP LOCKED` y lease limitado. Solo un rechazo explícito `429` se reintenta con backoff de 1, 5, 15 y 60 minutos; red, timeout, `408`, `5xx`, respuesta inválida, pérdida de lease o fallo tras aceptación quedan terminales como resultado desconocido para evitar reenvío automático. Solo persiste el hash del identificador devuelto por el proveedor. El runtime conserva cero `SELECT` o DML sobre las tablas privadas.
+
+La resolución y la reapertura exigen `Idempotency-Key`, versión vigente, motivo de 3 a 300 caracteres y una cuenta moderadora distinta de la autora. El historial conserva la acción; la auditoría guarda solo la huella del motivo. `PATCH /api/v1/contributions/:id` permite corregir por API todos los campos estructurados mientras el registro siga en borrador. La interfaz pública todavía no ofrece ese formulario de edición.
 
 `EMAIL_PROVIDER=disabled` es el modo seguro por defecto. Las cuentas solo se anuncian y `request-link` solo persiste cuando están configurados base, los cuatro secretos de autenticación y un proveedor Brevo real. Una activación aprobada requiere `EMAIL_PROVIDER=brevo`, una `BREVO_API_KEY` privada y `BREVO_SENDER` verificado. `fake` solo está permitido con `NODE_ENV=test`. El cliente usa `fetch`, `AbortController`, HTML y texto sin recursos remotos e `idempotencyKey`; esta señal no se considera garantía de deduplicación. En el Bloque 25 se verificaron dos entregas reales, ambas aceptadas en el primer intento, sin probar una respuesta ambigua ni la deduplicación del proveedor.
 
@@ -95,15 +100,15 @@ La autenticación usa tokens de un solo uso de 15 minutos, UUID público más 25
 
 El listado de zonas devuelve solo una caja geográfica (`bbox`), nunca el polígono completo, y usa un cursor opaco versionado. El seed identifica Sevilla y tres áreas piloto con nombres explícitamente aproximados. Las aportaciones deben quedar cubiertas por Sevilla y su zona, las líneas son simples y no superan 5 km. Un visitante anónimo ve únicamente contenido publicado; autor y moderadores tienen visibilidad adicional según rol.
 
-El planificador no guarda origen ni destino. Ajusta ambos puntos a la red publicada a un máximo de 75 metros y rechaza puntos fuera de Casco Antiguo o separados menos de 25 metros. Los cierres publicados excluyen tramos; las barreras excluyen la alternativa accesible; iluminación, incertidumbre e incidencias publicadas modifican su coste. Las aportaciones no publicadas no influyen. Un atajo nunca crea una arista nueva. Consulta `docs/DATOS-OSM.md` para procedencia, ODbL e importación manual.
+El planificador no guarda origen ni destino. Ajusta ambos puntos a la red publicada a un máximo de 75 metros y rechaza puntos fuera de Casco Antiguo o separados menos de 25 metros. Una observación no publicada o resuelta no influye. En la variante conservadora actual, incluso una barrera comunitaria medida solo penaliza: ninguna aportación ciudadana excluye automáticamente un tramo. Solo los datos base OSM marcados como barrera pueden excluirlo del perfil accesible. Un atajo histórico nunca crea una arista nueva. Consulta `docs/DATOS-OSM.md`.
 
 ## Ficha de portfolio
 
-**Descripción GitHub (máximo 350 caracteres):** Community-powered pedestrian shortcut and accessibility map for Seville. Secure passwordless access, moderated geospatial contributions, trust scoring, PostgreSQL/PostGIS, MapLibre and a production-minded Node.js backend.
+**Descripción GitHub (máximo 350 caracteres):** Community-powered urban accessibility map for Seville. Report observable barriers, damaged walkways and difficult crossings; human moderation, explainable low-barrier routes, PostgreSQL/PostGIS, MapLibre and a production-minded Node.js backend.
 
 **Topics:** `nodejs`, `fastify`, `postgresql`, `postgis`, `maplibre`, `openstreetmap`, `civic-tech`, `accessibility`, `seville`, `community`.
 
-**Vídeo demo de 60 segundos:** 0–8 s, problema y portada; 8–20 s, mapa/lista y filtros; 20–35 s, dibujar y enviar un atajo; 35–47 s, moderación por una segunda cuenta; 47–55 s, publicación, votos, score e historial; 55–60 s, arquitectura, tests y aviso de seguridad.
+**Vídeo demo de 60 segundos:** 0–8 s, una barrera urbana; 8–20 s, mapa/lista y filtros por condición; 20–35 s, comunicar un paso estrecho sin datos personales; 35–47 s, moderación independiente; 47–55 s, ruta con menos barreras conocidas; 55–60 s, arquitectura, pruebas y límites.
 
 ## Límites
 

@@ -1,5 +1,18 @@
 # Tareas
 
+## Bloque 31 — RutaViva Accesible
+
+- [x] Reenfocar portada, ayuda y presentación hacia barreras urbanas y movilidad inclusiva.
+- [x] Mantener `shortcut` como dato histórico compatible y fuera del primer plano.
+- [x] Añadir migración 021 aditiva con condición, grupos potencialmente afectados, fecha, permanencia, medición, anchura y ciclo abierto/resuelto.
+- [x] Añadir filtros combinados, formulario guiado, confirmación de privacidad y estados textuales equivalentes al mapa.
+- [x] Aplicar una política de rutas conservadora: pendiente/resuelta no afecta; una ciudadana publicada puede penalizar, pero nunca excluye automáticamente; solo una barrera base OSM excluye en este MVP.
+- [x] Hacer resolución y reapertura idempotentes, versionadas, auditadas y prohibidas al autor; la auditoría guarda una huella, no el motivo completo.
+- [x] Permitir por API la corrección cerrada de todos los campos estructurados de un borrador; la interfaz de edición sigue pendiente.
+- [x] Aplicar migraciones 021 y 022 en Supabase; verificar 22/22 y ejecutar integración real 27/27 con rollback.
+- [ ] Medir y validar sobre el terreno el primer posible estrechamiento; la fotografía aportada no se publica.
+- [ ] Ampliar la red de rutas fuera de Casco Antiguo tras una prueba de capacidad independiente.
+
 ## Bloque 29
 
 - [x] Motor Dijkstra determinista con perfiles directo y accesible.
@@ -11,7 +24,19 @@
 - [x] Ejecutar la importación OSM real y comprobar el release: 12.272 nodos y 27.620 tramos.
 - [x] Ejecutar la prueba de integración real: 26/26 en verde y rollback sin residuo.
 - [x] Preparar credibilidad pública, guía accesible ampliada y presentación comercial.
-- [ ] Publicar el Bloque 29 en `main` y comprobar el despliegue automático.
+- [x] Publicar el Bloque 29 mediante el PR #2, integrado en `main` con el commit `56d3845`.
+- [x] Publicar el diagnóstico mediante el PR #3, integrado en `main` con el commit `670a7c3`.
+- [x] Verificar Render `Live`: `/api/v1/health` 200, `/api/v1/ready` 200 con seis comprobaciones correctas, `/api/v1/stats` 200 y `/api/v1/routes/search` 200 en una muestra de 816 m y puntuación 84.
+
+## Bloque 30
+
+- [x] Preparar la guía operativa, criterios de aceptación y plantilla de evidencia del primer piloto real.
+- [x] Documentar separación técnica de cuentas, privacidad, errores seguros y resultado válido aunque una ruta no cambie.
+- [ ] Confirmar qué cuenta será autora y cuál moderadora; se recomienda personal autora y laboral moderadora.
+- [ ] Recibir de Jesús un caso real: tipo, ubicación pública, punto/línea, título, descripción, fecha/vigencia, confirmación sin datos personales y trayecto A/B.
+- [ ] Ejecutar y documentar la ruta anterior, aportación, moderación con otra cuenta y ruta posterior; ambas cuentas las opera Jesús en este piloto.
+- [ ] Validar en una fase futura la independencia humana con una persona autora y otra moderadora.
+- [ ] Comprobar visibilidad, puntuación e historial del caso real en la web pública.
 
 ## Bloque 20
 
@@ -121,7 +146,7 @@ Nada de esta segunda sección se considera implementado.
 - [x] OpenAPI 0.5.0, CI, Render Blueprint, guía de despliegue y plan del piloto.
 - [x] Catorce migraciones aplicadas; `npm run check`, 80/80 locales y 25/25 de integración real en verde.
 - [x] Rol `administrator` concedido de forma explícita a la única cuenta activa; herramienta posterior idempotente.
-- [ ] Validación con una segunda cuenta real: una persona aporta y otra modera, porque la auto-moderación está prohibida.
+- [ ] Validación con una segunda cuenta real operada por Jesús: una cuenta aporta y otra modera, porque una cuenta no puede moderar su propia aportación. La validación con dos personas distintas queda para una fase futura.
 - [ ] Prueba en móvil físico y lector de pantalla.
 
 ## Bloque 27
@@ -139,7 +164,7 @@ Nada de esta segunda sección se considera implementado.
 - [x] Enlace «Cómo usar» visible sin sesión.
 - [x] Guía estática con siete recorridos, resumen, glosario, privacidad, seguridad y ayuda ante errores.
 - [x] Flujos reales documentados para explorar, entrar, aportar, dibujar, enviar, moderar y confirmar.
-- [x] Separación de funciones explicada: nadie puede revisar su propia aportación.
+- [x] Separación de funciones explicada: una cuenta no puede revisar su propia aportación.
 - [x] Navegación por teclado y salto al contenido comprobados en navegador.
 - [x] Vista de 360 px comprobada: ancho de documento 345/345, tabla de 301 px y cero elementos desbordados.
 - [x] Suite local 90/90 y revisión independiente aprobada sin hallazgos pendientes.
