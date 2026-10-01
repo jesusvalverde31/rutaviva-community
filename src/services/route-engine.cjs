@@ -5,6 +5,7 @@ const PENALTIES = Object.freeze({
   accessibilityUnknownDirect: 0.10,
   lightingUnknown: 0.05,
   lightingPoor: 0.15,
+  observedBarrier: 0.35,
   barrierDirect: 0.70,
   maxIncidentRisk: 0.90
 });
@@ -16,18 +17,20 @@ class RouteEngineError extends Error {
 const clamp = (value, minimum, maximum) => Math.max(minimum, Math.min(maximum, value));
 
 function contributionEffect(contribution) {
-  if (!contribution || contribution.status !== 'published') return null;
+  if (!contribution || contribution.status !== 'published' || contribution.lifecycleStatus === 'resolved' || contribution.lifecycle === 'resolved' || contribution.lifecycle_status === 'resolved') return null;
   const confidence = clamp(Number(contribution.confidence ?? 0.5), 0, 1);
-  return { kind: contribution.kind, confidence, title: String(contribution.title || '').slice(0, 80) };
+  const measurementStatus = contribution.measurementStatus || contribution.measurement_status || 'unmeasured';
+  const sufficientEvidence = measurementStatus === 'measured' && confidence >= 0.7;
+  return { kind: contribution.kind, confidence, measurementStatus, sufficientEvidence, title: String(contribution.title || '').slice(0, 80) };
 }
 
 function segmentPolicy(segment, profile) {
   const effects = (segment.contributions || []).map(contributionEffect).filter(Boolean);
-  if (effects.some(effect => effect.kind === 'closure')) return { excluded: true, reason: 'closure' };
   const baseBarrier = segment.accessibilityStatus === 'barrier';
   const communityBarrier = effects.some(effect => effect.kind === 'barrier');
+  const verifiedCommunityBarrier = effects.some(effect => effect.kind === 'barrier' && effect.sufficientEvidence);
   const barrier = baseBarrier || communityBarrier;
-  if (profile === 'accessible' && barrier) return { excluded: true, reason: 'barrier' };
+  if (profile === 'accessible' && baseBarrier) return { excluded: true, reason: 'barrier' };
 
   let penalty = 0;
   const factors = [];
@@ -35,7 +38,9 @@ function segmentPolicy(segment, profile) {
   if (segment.accessibilityStatus === 'unknown') add(profile === 'accessible' ? PENALTIES.accessibilityUnknownAccessible : PENALTIES.accessibilityUnknownDirect, 'Accesibilidad sin confirmar');
   if (segment.lightingStatus === 'unknown') add(PENALTIES.lightingUnknown, 'Iluminación sin confirmar');
   if (segment.lightingStatus === 'poor') add(PENALTIES.lightingPoor, 'Iluminación deficiente');
-  if (barrier) add(PENALTIES.barrierDirect, communityBarrier ? 'Barrera comunitaria publicada' : 'Barrera de accesibilidad en datos OSM');
+  if (baseBarrier) add(PENALTIES.barrierDirect, 'Barrera de accesibilidad en datos OSM');
+  else if (communityBarrier) add(verifiedCommunityBarrier ? PENALTIES.barrierDirect : PENALTIES.observedBarrier, verifiedCommunityBarrier ? 'Barrera comunitaria medida y publicada' : 'Posible barrera comunitaria publicada, sin medición suficiente');
+  if (effects.some(effect => effect.kind === 'closure')) add(effects.some(effect => effect.kind === 'closure' && effect.sufficientEvidence) ? PENALTIES.barrierDirect : PENALTIES.observedBarrier, effects.some(effect => effect.kind === 'closure' && effect.sufficientEvidence) ? 'Cierre comunitario medido y publicado' : 'Posible cierre publicado, sin medición suficiente');
 
   const incidentRisk = clamp(1 - effects
     .filter(effect => effect.kind === 'lighting')
