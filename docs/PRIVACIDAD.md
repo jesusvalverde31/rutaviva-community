@@ -1,5 +1,9 @@
 # Privacidad por defecto
 
+## Minimización en observaciones urbanas
+
+RutaViva no pregunta ni almacena si la persona autora tiene una discapacidad. Solo registra grupos que podrían verse afectados por una condición urbana. La persona confirma que título, descripción y ubicación no incluyen nombres, teléfonos, matrículas u otros datos personales. La versión 1 no admite fotografías; cualquier futura función de imágenes necesitará consentimiento, moderación y tratamiento de rostros y matrículas.
+
 - Las rutas se consultan sin cuenta.
 - La geolocalización se solicita solo tras una acción explícita.
 - No se guarda posición actual ni historial de recorridos por defecto.

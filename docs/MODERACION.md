@@ -1,5 +1,11 @@
 # Moderación propuesta
 
+## Criterios operativos de accesibilidad
+
+Antes de publicar se comprueban: condición observable, ubicación coherente, fecha, permanencia, grupos potencialmente afectados, ausencia de datos personales y diferencia entre anchura estimada y medida. “Publicada” significa revisada por otra cuenta; no significa certificada ni conforme a normativa. En la variante conservadora actual, toda aportación comunitaria abierta puede advertir y penalizar, pero ninguna excluye automáticamente un paso. Al marcarla resuelta deja de afectar rutas y conserva auditoría. La auto-moderación continúa prohibida.
+
+Una publicación resuelta puede reabrirse si una nueva comprobación muestra que la condición vuelve a estar presente. Resolver y reabrir exigen versión, motivo de 3 a 300 caracteres e `Idempotency-Key`; ambos cambios son append-only, idempotentes y siguen prohibidos para la cuenta autora. El texto del motivo se usa para validar la operación, pero la auditoría persistente conserva únicamente su huella SHA-256 y la acción.
+
 ## Roles
 
 Visitante consulta; colaborador verificado aporta y señala; moderador revisa; administrador gobierna red y roles; sistema ejecuta caducidades y trabajos.

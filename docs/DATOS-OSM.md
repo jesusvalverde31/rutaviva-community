@@ -17,7 +17,7 @@ Fuente: https://www.openstreetmap.org/copyright
 
 ## Importación manual
 
-Primero deben estar aplicadas las 20 migraciones. Desde la raíz del proyecto:
+Primero deben estar aplicadas todas las migraciones locales verificadas. Desde la raíz del proyecto:
 
 ```text
 npm run migrate
