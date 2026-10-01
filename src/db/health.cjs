@@ -25,7 +25,8 @@ const REQUIRED_RELATIONS = [
   'app_private.rate_limit_buckets',
   'app_private.contribution_history',
   'app_private.moderation_cases',
-  'app_private.moderation_decisions'
+  'app_private.moderation_decisions',
+  'app_private.contribution_lifecycle_requests'
 ];
 
 const REQUIRED_FUNCTIONS = [
@@ -55,6 +56,11 @@ const REQUIRED_FUNCTIONS = [
   ,'app_private.community_stats()'
   ,'app_private.zone_leaderboard()'
   ,'app_private.activity_summary()'
+  ,'app_private.create_accessibility_contribution(uuid,uuid,uuid,uuid,text,text,text,jsonb,text,text[],date,text,text,integer,boolean,uuid)'
+  ,'app_private.update_accessibility_contribution(uuid,uuid,bigint,text,text,text,jsonb,text,text[],date,text,text,integer,boolean,uuid)'
+  ,'app_private.list_accessibility_contributions(uuid,text,text,text,text,text,text,integer)'
+  ,'app_private.get_accessibility_contribution(uuid,uuid)'
+  ,'app_private.set_accessibility_lifecycle(uuid,uuid,bigint,text,text,uuid,bytea)'
 ];
 
 const READINESS_SQL = `
