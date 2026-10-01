@@ -16,6 +16,10 @@ const { createContributionsRepository } = require('./db/repositories/contributio
 const { createModerationRepository } = require('./db/repositories/moderation.cjs');
 const { contributionsRoutes } = require('./routes/contributions.cjs');
 const { moderationRoutes } = require('./routes/moderation.cjs');
+const { createRoutesRepository } = require('./db/repositories/routes.cjs');
+const { routesRoutes } = require('./routes/routes.cjs');
+const { createStatsRepository } = require('./db/repositories/stats.cjs');
+const { credibilityRoutes } = require('./routes/credibility.cjs');
 
 const REDACT = ['req.headers.authorization', 'req.headers.cookie', 'req.headers["x-csrf-token"]', 'req.headers["idempotency-key"]', 'res.headers["set-cookie"]', '*.password', '*.token', '*.secret', '*.email'];
 
@@ -52,6 +56,12 @@ function createApp(options = {}) {
   const moderationRepository = Object.hasOwn(options, 'moderationRepository')
     ? options.moderationRepository
     : (database ? createModerationRepository(database) : null);
+  const routesRepository = Object.hasOwn(options, 'routesRepository')
+    ? options.routesRepository
+    : (database ? createRoutesRepository(database) : null);
+  const statsRepository = Object.hasOwn(options, 'statsRepository')
+    ? options.statsRepository
+    : (database ? createStatsRepository(database) : null);
   const readinessTimeoutMs = options.readinessTimeoutMs || 1000;
   const app = Fastify({
     logger: options.logger === undefined ? { level: config.logLevel, redact: REDACT } : options.logger,
@@ -90,7 +100,7 @@ function createApp(options = {}) {
   });
 
   webRoutes(app);
-  publicRoutes(app, { database, config });
+  publicRoutes(app, { database, config, routesRepository });
   authRoutes(app, {
     authService,
     config,
@@ -108,6 +118,8 @@ function createApp(options = {}) {
     authService,
     config
   });
+  routesRoutes(app, { repository: routesRepository, config, rateLimiter: options.routeRateLimiter });
+  credibilityRoutes(app, { database, config, statsRepository });
 
   app.setNotFoundHandler(() => { throw new AppError(404, 'ROUTE_NOT_FOUND', 'No encontramos el recurso solicitado.'); });
 
