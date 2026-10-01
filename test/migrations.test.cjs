@@ -10,9 +10,9 @@ const migrationsDirectory = path.resolve(__dirname, '..', 'migrations');
 const runtimePassword = 'r'.repeat(40);
 const runtimeOptions = { runtimeRole: 'rutaviva_runtime', runtimePassword };
 
-test('carga veinte migraciones continuas y conserva inmutables las aplicadas', () => {
+test('carga veintidós migraciones continuas y conserva inmutables las aplicadas', () => {
   const migrations = loadMigrationFiles(migrationsDirectory);
-  assert.deepEqual(migrations.map(item => item.version), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
+  assert.deepEqual(migrations.map(item => item.version), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]);
   assert.equal(migrations[4].checksum, 'f01bed78ca59b7cee3d0a6ff97f093742d455ba2a9b5f812fea692ef75476a07');
   assert.match(checksum('ruta viva'), /^[0-9a-f]{64}$/);
   assert.equal(migrations[3].sql.includes('route_segments'), false);
@@ -155,6 +155,26 @@ test('carga veinte migraciones continuas y conserva inmutables las aplicadas', (
   assert.equal((migrations[17].sql.match(/SET search_path = pg_catalog, extensions/g)||[]).length,2);
   assert.match(migrations[18].sql, /node_count BETWEEN 0 AND 15000/);
   assert.match(migrations[18].sql, /segment_count BETWEEN 0 AND 30000/);
+  assert.match(migrations[20].sql, /ADD COLUMN condition_type/);
+  assert.match(migrations[20].sql, /personal_data_confirmed boolean NOT NULL DEFAULT false/);
+  assert.match(migrations[20].sql, /create_accessibility_contribution/);
+  assert.match(migrations[20].sql, /CREATE OR REPLACE FUNCTION app_private\.create_contribution[\s\S]*p_kind<>'shortcut'/);
+  assert.match(migrations[20].sql, /update_accessibility_contribution/);
+  assert.match(migrations[20].sql, /set_accessibility_lifecycle/);
+  assert.match(migrations[20].sql, /contribution_lifecycle_requests/);
+  assert.match(migrations[20].sql, /'reopened'/);
+  assert.match(migrations[20].sql, /CREATE OR REPLACE FUNCTION app_private\.get_route_network/);
+  assert.match(migrations[20].sql, /'measurementStatus',item\.measurement_status,'lifecycleStatus',item\.lifecycle_status/);
+  assert.match(migrations[20].sql, /DROP FUNCTION app_private\.list_moderation_cases/);
+  assert.match(migrations[20].sql, /condition_type text,affected_groups text\[\],observed_on date/);
+  assert.ok(migrations[20].sql.indexOf("contribution-create:'||p_id") < migrations[20].sql.indexOf('SELECT contribution.* INTO existing'));
+  assert.equal((migrations[20].sql.match(/contribution-create:'\|\|p_id/g)||[]).length,2);
+  assert.doesNotMatch(migrations[20].sql, /DROP (?:TABLE|COLUMN)/i);
+  assert.match(migrations[21].sql, /CREATE OR REPLACE FUNCTION app_private\.get_route_network/);
+  assert.equal((migrations[21].sql.match(/OPERATOR\(extensions\.<->\)/g)||[]).length,2);
+  assert.match(migrations[21].sql, /'measurementStatus',item\.measurement_status,'lifecycleStatus',item\.lifecycle_status/);
+  assert.doesNotMatch(migrations[21].sql, /ORDER BY node\.position<->/);
+  assert.doesNotMatch(migrations[21].sql, /DROP (?:TABLE|COLUMN)/i);
 });
 
 test('rechaza huecos, control transaccional y checksum alterado', () => {
@@ -182,7 +202,7 @@ test('migrador bloquea, aplica en orden e inserta checksum parametrizado', async
     }
   };
   const result = await runMigrations({ client, migrationsDirectory, ...runtimeOptions });
-  assert.deepEqual(result, { total: 20, executed: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] });
+  assert.deepEqual(result, { total: 22, executed: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22] });
   assert.match(calls[0].text, /pg_advisory_lock/);
   const passwordCall = calls.find(call => String(call.text).includes("set_config('rutaviva.runtime_password'"));
   assert.deepEqual(passwordCall.values, [runtimePassword]);
@@ -193,8 +213,8 @@ test('migrador bloquea, aplica en orden e inserta checksum parametrizado', async
   assert.match(ENSURE_RUNTIME_ROLE_SQL, /CREATE ROLE rutaviva_runtime[\s\S]*PASSWORD %L/);
   assert.doesNotMatch(ENSURE_RUNTIME_ROLE_SQL, /ALTER ROLE/);
   const inserts = calls.filter(call => String(call.text).startsWith('INSERT INTO app_private.schema_migrations'));
-  assert.equal(inserts.length, 20);
-  assert.deepEqual(inserts.map(call => call.values[0]), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
+  assert.equal(inserts.length, 22);
+  assert.deepEqual(inserts.map(call => call.values[0]), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]);
   assert.equal(calls.some(call => String(call.text).includes('pg_advisory_unlock')), true);
 });
 

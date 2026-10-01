@@ -171,7 +171,7 @@ test('flujo comunitario real es idempotente, moderado, auditado y revierte sus d
       [contributionId]
     ));
 
-    const secondValues = [authorSession, withdrawnId, cityId, null, 'barrier', 'Barrera temporal de prueba', 'Debe resolverse al retirar', geometry, randomUUID()];
+    const secondValues = [authorSession, withdrawnId, cityId, null, 'shortcut', 'Atajo temporal de prueba', 'Debe resolverse al retirar', geometry, randomUUID()];
     await client.query(createSql, secondValues);
     await client.query("SELECT * FROM app_private.transition_own_contribution($1,$2,1,'submit',$3)", [authorSession, withdrawnId, randomUUID()]);
     const withdrawn = await client.query("SELECT * FROM app_private.transition_own_contribution($1,$2,2,'withdraw',$3)", [authorSession, withdrawnId, randomUUID()]);
@@ -192,4 +192,40 @@ test('flujo comunitario real es idempotente, moderado, auditado y revierte sus d
   } finally {
     await client.end().catch(() => {});
   }
+});
+
+test('flujo accesible proyecta evidencia, resolución y reapertura idempotentes sin persistir', { timeout:30_000 }, async t => {
+  if(!config.migrationDatabaseConfigured){t.skip('MIGRATION_DATABASE_URL no configurada');return;}
+  const client=new Client({connectionString:config.migrationDatabaseUrl,ssl:tlsOptions(config.databaseSsl,config.databaseCaFile),connectionTimeoutMillis:config.databaseConnectTimeoutMs,statement_timeout:config.databaseQueryTimeoutMs,application_name:'rutaviva-accessibility-integration'});
+  const authorId=randomUUID(),moderatorId=randomUUID(),authorSession=randomUUID(),moderatorSession=randomUUID(),contributionId=randomUUID();
+  try{
+    await client.connect();await client.query('BEGIN');
+    const sample=await client.query("SELECT release.city_id,extensions.ST_AsGeoJSON(extensions.ST_LineInterpolatePoint(segment.geometry,0.5))::jsonb AS geometry,extensions.ST_X(source.position) AS origin_lon,extensions.ST_Y(source.position) AS origin_lat,extensions.ST_X(target.position) AS destination_lon,extensions.ST_Y(target.position) AS destination_lat FROM app.network_releases release JOIN app.route_segments segment ON segment.release_id=release.id AND segment.is_published JOIN app.route_nodes source ON source.id=segment.source_node_id JOIN app.route_nodes target ON target.id=segment.target_node_id WHERE release.status='published' ORDER BY segment.id LIMIT 1");
+    if(!sample.rowCount){await client.query('ROLLBACK');t.skip('Red publicada no disponible');return;}
+    await client.query('INSERT INTO app.users(id,public_alias) VALUES($1,$2),($3,$4)',[authorId,`Autor accesible ${authorId.slice(0,8)}`,moderatorId,`Moderador accesible ${moderatorId.slice(0,8)}`]);
+    await client.query("INSERT INTO app.user_roles(user_id,role_code) VALUES($1,'collaborator'),($2,'moderator')",[authorId,moderatorId]);
+    await client.query("INSERT INTO app_private.sessions(id,user_id,token_hash,idle_expires_at,expires_at) VALUES($1,$2,$3,clock_timestamp()+interval '1 day',clock_timestamp()+interval '7 days'),($4,$5,$6,clock_timestamp()+interval '1 day',clock_timestamp()+interval '7 days')",[authorSession,authorId,randomBytes(32),moderatorSession,moderatorId,randomBytes(32)]);
+    const observedOn=new Date().toISOString().slice(0,10);const title=`Paso estrecho ${contributionId.slice(0,8)}`;
+    const createSql='SELECT * FROM app_private.create_accessibility_contribution($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)';
+    const values=[authorSession,contributionId,sample.rows[0].city_id,null,'barrier',title,'Observación sintética sin datos personales',sample.rows[0].geometry,'narrow_passage',['wheelchair','visual'],observedOn,'unknown','unmeasured',null,true,randomUUID()];
+    const created=await client.query(createSql,values);assert.equal(created.rows[0].status,'draft');
+    const replay=await client.query(createSql,values);assert.deepEqual(replay.rows,created.rows);
+    await expectSqlState(client,'accessibility_create_conflict','23505',()=>client.query(createSql,[...values.slice(0,6),'Contenido distinto',...values.slice(7)]));
+    const updated=await client.query('SELECT * FROM app_private.update_accessibility_contribution($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)',[authorSession,contributionId,1,'barrier',title,'Observación sintética corregida',sample.rows[0].geometry,'narrow_passage',['wheelchair'],observedOn,'permanent','estimated',85,true,randomUUID()]);assert.equal(Number(updated.rows[0].version),2);
+    await client.query("SELECT * FROM app_private.transition_own_contribution($1,$2,2,'submit',$3)",[authorSession,contributionId,randomUUID()]);
+    const queue=await client.query("SELECT * FROM app_private.list_moderation_cases($1,'pending',100) WHERE contribution_id=$2",[moderatorSession,contributionId]);assert.equal(queue.rowCount,1);assert.equal(queue.rows[0].condition_type,'narrow_passage');assert.deepEqual(queue.rows[0].affected_groups,['wheelchair']);assert.equal(queue.rows[0].measurement_status,'estimated');assert.equal(queue.rows[0].clear_width_cm,85);assert.equal(queue.rows[0].personal_data_confirmed,true);
+    const caseId=queue.rows[0].id;await client.query('SELECT * FROM app_private.claim_moderation_case($1,$2,$3,$4)',[moderatorSession,caseId,1,randomUUID()]);
+    await client.query("SELECT * FROM app_private.decide_moderation_case($1,$2,2,'published',$3,$4)",[moderatorSession,caseId,'Condición observable y privacidad comprobadas',randomUUID()]);
+    const routeArgs=[sample.rows[0].origin_lon,sample.rows[0].origin_lat,sample.rows[0].destination_lon,sample.rows[0].destination_lat,75];
+    const projectedOpen=await client.query('SELECT contributions FROM app_private.get_route_network($1,$2,$3,$4,$5)',routeArgs);const openItem=projectedOpen.rows.flatMap(row=>row.contributions).find(item=>item.title===title);assert.equal(openItem.lifecycleStatus,'open');assert.equal(openItem.measurementStatus,'estimated');
+    const resolveId=randomUUID(),resolveHash=randomBytes(32);const lifecycleSql='SELECT * FROM app_private.set_accessibility_lifecycle($1,$2,$3,$4,$5,$6,$7)';
+    const resolved=await client.query(lifecycleSql,[moderatorSession,contributionId,5,'resolve','Retirada tras comprobación presencial',resolveId,resolveHash]);assert.equal(resolved.rows[0].lifecycle_status,'resolved');
+    const historyAfterResolve=await client.query('SELECT count(*)::integer AS total FROM app_private.contribution_history WHERE contribution_id=$1',[contributionId]);const resolveReplay=await client.query(lifecycleSql,[moderatorSession,contributionId,5,'resolve','Retirada tras comprobación presencial',resolveId,resolveHash]);assert.deepEqual(resolveReplay.rows,resolved.rows);const historyAfterReplay=await client.query('SELECT count(*)::integer AS total FROM app_private.contribution_history WHERE contribution_id=$1',[contributionId]);assert.equal(historyAfterReplay.rows[0].total,historyAfterResolve.rows[0].total);
+    await expectSqlState(client,'lifecycle_idempotency_conflict','23505',()=>client.query(lifecycleSql,[moderatorSession,contributionId,5,'resolve','Motivo diferente',resolveId,randomBytes(32)]));
+    const projectedResolved=await client.query('SELECT contributions FROM app_private.get_route_network($1,$2,$3,$4,$5)',routeArgs);assert.equal(projectedResolved.rows.flatMap(row=>row.contributions).find(item=>item.title===title).lifecycleStatus,'resolved');
+    const reopenId=randomUUID(),reopenHash=randomBytes(32);const reopenValues=[moderatorSession,contributionId,6,'reopen','La barrera vuelve a estar presente',reopenId,reopenHash];const reopened=await client.query(lifecycleSql,reopenValues);assert.equal(reopened.rows[0].lifecycle_status,'open');const historyAfterReopen=await client.query('SELECT count(*)::integer AS total FROM app_private.contribution_history WHERE contribution_id=$1',[contributionId]);const reopenReplay=await client.query(lifecycleSql,reopenValues);assert.deepEqual(reopenReplay.rows,reopened.rows);const historyAfterReopenReplay=await client.query('SELECT count(*)::integer AS total FROM app_private.contribution_history WHERE contribution_id=$1',[contributionId]);assert.equal(historyAfterReopenReplay.rows[0].total,historyAfterReopen.rows[0].total);
+    const actions=await client.query('SELECT action FROM app_private.contribution_history WHERE contribution_id=$1 ORDER BY id',[contributionId]);assert.ok(actions.rows.some(row=>row.action==='resolved'));assert.ok(actions.rows.some(row=>row.action==='reopened'));
+    const audit=await client.query("SELECT details::text AS details FROM app_private.audit_events WHERE resource_id=$1 AND action='contribution.resolved'",[contributionId]);assert.equal(audit.rowCount,1);assert.doesNotMatch(audit.rows[0].details,/Retirada tras|comprobación presencial/i);
+    await client.query('ROLLBACK');const residue=await client.query('SELECT count(*)::integer AS total FROM app.contributions WHERE id=$1',[contributionId]);assert.equal(residue.rows[0].total,0);
+  }catch(error){await client.query('ROLLBACK').catch(()=>{});throw error;}finally{await client.end().catch(()=>{});}
 });

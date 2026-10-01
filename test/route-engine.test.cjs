@@ -26,14 +26,15 @@ test('directa prima distancia y accesible evita incertidumbre', () => {
   assert.match(result.direct.warnings.join(' '), /inferior al 80/);
 });
 
-test('solo aportaciones publicadas afectan y cierre publicado excluye', () => {
+test('solo aportaciones publicadas afectan y el cierre comunitario se trata de forma conservadora', () => {
   const draft = segmentPolicy({ distanceMeters: 10, accessibilityStatus: 'compatible', lightingStatus: 'lit', contributions: [{ kind: 'closure', status: 'submitted' }] }, 'direct');
-  const published = segmentPolicy({ distanceMeters: 10, accessibilityStatus: 'compatible', lightingStatus: 'lit', contributions: [{ kind: 'closure', status: 'published' }] }, 'direct');
-  assert.equal(draft.excluded, false); assert.equal(published.excluded, true);
+  const published = segmentPolicy({ distanceMeters: 10, accessibilityStatus: 'compatible', lightingStatus: 'lit', contributions: [{ kind: 'closure', status: 'published', measurementStatus:'measured', confidence:.8 }] }, 'direct');
+  const resolved = segmentPolicy({ distanceMeters: 10, accessibilityStatus: 'compatible', lightingStatus: 'lit', contributions: [{ kind:'closure',status:'published',measurementStatus:'measured',lifecycleStatus:'resolved',confidence:1 }] }, 'direct');
+  assert.equal(draft.excluded, false); assert.equal(published.excluded, false); assert.ok(published.cost > 10); assert.equal(resolved.cost,10);
 });
 
 test('penalizaciones centrales y score quedan acotados', () => {
-  assert.deepEqual(PENALTIES, { accessibilityUnknownAccessible: 0.35, accessibilityUnknownDirect: 0.10, lightingUnknown: 0.05, lightingPoor: 0.15, barrierDirect: 0.70, maxIncidentRisk: 0.90 });
+  assert.deepEqual(PENALTIES, { accessibilityUnknownAccessible: 0.35, accessibilityUnknownDirect: 0.10, lightingUnknown: 0.05, lightingPoor: 0.15, observedBarrier:0.35, barrierDirect: 0.70, maxIncidentRisk: 0.90 });
   const policy = segmentPolicy({ distanceMeters: 100, accessibilityStatus: 'barrier', lightingStatus: 'poor', contributions: [] }, 'direct');
   assert.equal(policy.cost, 185);
   assert.equal(policy.factors.some(factor=>factor.label==='Barrera de accesibilidad en datos OSM'),true);
