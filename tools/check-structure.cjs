@@ -45,6 +45,18 @@ const required = [
   , 'test/contributions.test.cjs', 'test/contributions.integration.test.cjs'
   , 'test/moderation.test.cjs', 'test/deployment.test.cjs', 'test/load.test.cjs'
   , 'test/grant-role.test.cjs'
+  , 'migrations/015_route_network.sql', 'migrations/016_route_planning.sql'
+  , 'scripts/import-osm-pilot.cjs', 'src/services/route-engine.cjs'
+  , 'src/db/repositories/routes.cjs', 'src/routes/routes.cjs'
+  , 'test/route-engine.test.cjs', 'test/routes.integration.test.cjs', 'test/import-osm.test.cjs'
+  , 'docs/DATOS-OSM.md'
+  , 'migrations/017_public_credibility.sql', 'src/db/repositories/stats.cjs'
+  , 'src/services/methodology.cjs', 'src/routes/credibility.cjs', 'test/credibility.test.cjs'
+  , 'docs/PRESENTACION-COMERCIAL.md'
+  , 'scripts/inspect-route-schema.cjs'
+  , 'migrations/018_postgis_operator_resolution.sql'
+  , 'migrations/019_route_network_capacity.sql'
+  , 'migrations/020_snap_route_points_fields.sql'
 ];
 
 const secretPatterns = [

@@ -1,5 +1,9 @@
 # Arquitectura A0 gratuita
 
+## Cálculo A→B
+
+El navegador envía únicamente origen y destino a `POST /api/v1/routes/search`. La API valida piloto, distancia, tamaño y cuota; el repositorio obtiene un grafo dirigido acotado mediante una función `SECURITY DEFINER`; Node calcula de forma determinista las opciones directa y accesible. Las coordenadas de búsqueda no se persisten ni se incluyen en logs. Las API de OpenStreetMap y, como respaldo, Overpass solo intervienen en la importación manual: las consultas de usuarios leen el release publicado en PostGIS.
+
 ## Estado
 
 **IMPLEMENTADOS el servidor, PostgreSQL/PostGIS, identidad, web local y canal de entrega; la conexión real de Brevo permanece desactivada hasta configuración explícita.**

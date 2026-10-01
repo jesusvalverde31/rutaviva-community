@@ -4,6 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Mapa comunitario moderado de atajos y caminos peatonales de Sevilla.">
+  <meta name="theme-color" content="#15342d">
+  <meta property="og:title" content="RutaViva Community Sevilla">
+  <meta property="og:description" content="Rutas peatonales explicables con conocimiento vecinal revisado y datos abiertos.">
+  <meta property="og:type" content="website">
   <title>RutaViva Community Sevilla</title>
   <link rel="stylesheet" href="/vendor/maplibre/maplibre-gl.css">
   <link rel="stylesheet" href="/styles.css">
@@ -13,16 +17,50 @@
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
   <header class="site-header">
     <a class="brand" href="#explorar" aria-label="RutaViva, explorar">Ruta<span>Viva</span></a>
-    <nav aria-label="Principal"><a href="#explorar">Explorar</a><a href="#aportar">Aportar</a><a href="#ayuda">Cómo usar</a><a id="moderation-nav" href="#moderar" hidden>Moderar</a><a href="#cuenta">Cuenta</a></nav>
+    <nav aria-label="Principal"><a href="#explorar">Explorar</a><a href="#zonas">Zonas</a><a href="#aportar">Aportar</a><a href="#ayuda">Cómo usar</a><a id="moderation-nav" href="#moderar" hidden>Moderar</a><a href="#cuenta">Cuenta</a></nav>
   </header>
   <aside class="safety-banner">Ruta orientativa: comprueba siempre el entorno y la señalización.</aside>
   <main id="contenido" tabindex="-1">
     <section class="hero" aria-labelledby="hero-title">
-      <div><p class="eyebrow">Sevilla · beta comunitaria</p><h1 id="hero-title">Los caminos que conoce el barrio.</h1><p class="lead">Dibuja un atajo, confirma lo que ves y ayuda a construir una red peatonal explicable.</p></div>
+      <div><p class="eyebrow">Sevilla · mapa comunitario moderado</p><h1 id="hero-title">Los caminos que conoce el barrio.</h1><p class="lead">Consulta rutas peatonales explicables, comparte un atajo o una barrera real y mejora el mapa con información revisada por personas.</p><p class="hero-actions"><a class="button-link" href="#explorar">Calcular una ruta</a><a class="button-link secondary-link" href="#aportar">Proponer una mejora</a></p></div>
       <div class="hero-stat"><strong id="hero-published">0</strong><span>aportaciones publicadas</span></div>
+    </section>
+    <section id="confianza" class="section" aria-labelledby="trust-title">
+      <div class="section-heading"><div><p class="eyebrow">Transparencia medible</p><h2 id="trust-title">Lo que sabemos, sin inventar cifras</h2></div><p id="trust-status" class="status" role="status" aria-live="polite">Cargando datos…</p></div>
+      <div class="trust-grid">
+        <article class="trust-card"><strong id="trust-publicados">…</strong><span>aportaciones publicadas</span></article>
+        <article class="trust-card"><strong id="trust-tasa">…</strong><span>tasa de publicación tras moderación</span></article>
+        <article class="trust-card"><strong id="trust-resolucion">…</strong><span>tiempo medio de revisión</span></article>
+        <article class="trust-card"><strong id="trust-red">…</strong><span>versión de red peatonal</span></article>
+      </div>
+      <p id="trust-notice" class="status" role="status"></p>
+    </section>
+    <section class="section" aria-labelledby="works-title">
+      <div class="section-heading"><div><p class="eyebrow">De la calle al mapa</p><h2 id="works-title">Cómo funciona en tres pasos</h2></div></div>
+      <ol class="feature-steps">
+        <li><strong>1. Una persona aporta.</strong><span>Señala un atajo, camino accesible, barrera, cierre o problema de iluminación que ha observado.</span></li>
+        <li><strong>2. Otra persona revisa.</strong><span>La moderación comprueba la descripción y el dibujo. Nadie puede aprobar su propia aportación.</span></li>
+        <li><strong>3. RutaViva lo explica.</strong><span>Solo la información publicada y vigente puede influir en el cálculo, que muestra distancia, cobertura y avisos.</span></li>
+      </ol>
     </section>
     <section id="explorar" class="section" aria-labelledby="explore-title">
       <div class="section-heading"><div><p class="eyebrow">Mapa vivo</p><h2 id="explore-title">Explorar aportaciones</h2></div><p id="contributions-status" class="status" role="status" aria-live="polite"></p></div>
+      <form id="route-planner" class="route-planner" aria-describedby="route-guidance route-warning">
+        <fieldset id="route-fieldset" aria-busy="false"><legend>Planifica tu ruta</legend>
+          <p id="route-guidance">Elige cada punto en el mapa o usa el centro visible. El cálculo no guarda tu búsqueda.</p>
+          <div class="route-point-grid">
+            <div><strong>A · Origen</strong><output id="route-origin">Sin elegir</output><button type="button" data-route-map="origin">Elegir en mapa</button><button class="secondary" type="button" data-route-center="origin">Usar centro</button></div>
+            <div><strong>B · Destino</strong><output id="route-destination">Sin elegir</output><button type="button" data-route-map="destination">Elegir en mapa</button><button class="secondary" type="button" data-route-center="destination">Usar centro</button></div>
+          </div>
+          <div class="route-actions"><button id="route-swap" class="secondary" type="button">Intercambiar A y B</button><button id="route-clear" class="secondary" type="button">Limpiar</button><button id="route-calculate" type="submit">Calcular ruta</button></div>
+          <p id="route-warning" class="route-warning">Resultado orientativo: no garantiza seguridad ni accesibilidad. Comprueba el entorno y la señalización.</p>
+          <p id="route-progress" class="status" role="status" aria-live="polite"></p>
+          <p id="route-status" class="status" role="status" aria-live="polite"></p>
+          <p id="route-error" class="route-error" role="alert" tabindex="-1"></p>
+          <button id="route-retry" class="secondary" type="button" hidden>Reintentar cálculo</button>
+          <div id="route-results" class="route-results" hidden></div>
+        </fieldset>
+      </form>
       <form id="filters" class="filters" role="search">
         <label>Buscar<input id="search" name="q" type="search" maxlength="80" placeholder="Zona, título o descripción"></label>
         <label>Estado<select id="status-filter" name="status"><option value="">Todas</option><option value="submitted">Pendientes</option><option value="under_review">En revisión</option><option value="published">Publicadas</option></select></label>
@@ -33,6 +71,32 @@
         <div class="list-pane"><ul id="contributions-list" class="contribution-list" aria-busy="true"></ul><button id="contributions-retry" class="secondary" hidden>Reintentar</button></div>
         <div class="map-wrap"><div id="map" aria-label="Mapa de aportaciones de Sevilla"></div><p id="map-status" class="map-status" role="status">Cargando mapa…</p></div>
       </div>
+    </section>
+    <section id="zonas" class="section" aria-labelledby="zones-title">
+      <div class="section-heading"><div><p class="eyebrow">Piloto Sevilla</p><h2 id="zones-title">Actividad por zonas</h2></div><p id="zone-status" class="status" role="status" aria-live="polite">Cargando zonas…</p></div>
+      <ul id="zone-cards" class="zone-cards" aria-busy="true"></ul>
+      <p class="meta">Los límites mostrados son aproximados. Si hay menos de cinco participantes, RutaViva oculta recuentos y fechas.</p>
+    </section>
+    <section id="metodologia" class="section" aria-labelledby="method-title">
+      <div class="section-heading"><div><p class="eyebrow">Método abierto</p><h2 id="method-title">Por qué una aportación merece confianza</h2></div><p id="method-status" class="status" role="status">Cargando metodología…</p></div>
+      <p id="method-version" class="meta">Metodología versionada.</p>
+      <div class="method-grid">
+        <article><h3>Señales comunitarias</h3><p id="method-formula">La puntuación combina acuerdo, cantidad de evidencia y antigüedad.</p></article>
+        <article><h3>Revisión humana</h3><p id="method-moderation">Una puntuación nunca publica por sí sola y nadie modera su propia aportación.</p></article>
+        <article><h3>Límites visibles</h3><p id="method-privacy">Los grupos pequeños se protegen y toda ruta sigue siendo orientativa.</p></article>
+      </div>
+    </section>
+    <section class="section" aria-labelledby="people-title">
+      <div class="section-heading"><div><p class="eyebrow">Diseñada para personas</p><h2 id="people-title">La misma ciudad, necesidades distintas</h2></div></div>
+      <div class="profiles">
+        <article class="profile-card"><h3>Personas mayores</h3><p>Pasos grandes, instrucciones escritas y alternativas cuando manejar el mapa resulta difícil.</p></article>
+        <article class="profile-card"><h3>Familias y peatones</h3><p>Información vecinal revisada sobre cierres, iluminación y caminos cotidianos.</p></article>
+        <article class="profile-card"><h3>Movilidad reducida</h3><p>Una alternativa que evita barreras conocidas y declara qué porcentaje de accesibilidad está confirmado.</p></article>
+      </div>
+    </section>
+    <section class="section" aria-labelledby="pulse-title">
+      <div class="section-heading"><div><p class="eyebrow">Pulso del piloto</p><h2 id="pulse-title">Actividad reciente protegida</h2></div><p id="pulse-status" class="status" role="status"></p></div>
+      <div class="trust-grid pulse-grid"><article class="trust-card"><strong id="pulse-7">…</strong><span>acciones en 7 días</span></article><article class="trust-card"><strong id="pulse-30">…</strong><span>acciones en 30 días</span></article></div>
     </section>
     <section class="section" aria-labelledby="activity-title">
       <div class="section-heading"><div><p class="eyebrow">Últimos siete días</p><h2 id="activity-title">Actividad comunitaria</h2></div><p id="activity-status" class="status"></p></div>
@@ -62,28 +126,36 @@
           <div class="help-answer"><p>En <a href="#explorar">Explorar</a> puedes buscar por zona, título o descripción. También puedes combinar los filtros de estado y tipo. Pulsa <strong>Buscar</strong> para aplicarlos y <strong>Limpiar</strong> para volver a ver todo.</p><p>Cada aportación de la lista incluye <strong>Ver en mapa</strong> para localizar su dibujo y <strong>Ver historial</strong> para consultar sus cambios. El mapa y la lista muestran la misma información; si el mapa te resulta difícil, puedes usar la lista y el historial.</p></div>
         </details>
         <details>
-          <summary>2. Entrar con un enlace mágico</summary>
+          <summary>2. Calcular una ruta de A a B</summary>
+          <div class="help-answer"><p>Ve a <a href="#explorar">Explorar</a>. En <strong>A · Origen</strong>, pulsa <strong>Elegir en mapa</strong> y después toca el lugar desde el que sales. Repite lo mismo en <strong>B · Destino</strong>. Si te cuesta señalar un punto, mueve el mapa hasta el lugar y pulsa <strong>Usar centro</strong>.</p><p>Pulsa <strong>Calcular ruta</strong>. Verás primero la opción directa y, cuando exista una distinta, otra con menos barreras conocidas. Lee la distancia, el tiempo estimado, la puntuación, la cobertura accesible y el recorrido escrito. <strong>Intercambiar A y B</strong> cambia el sentido; <strong>Limpiar</strong> permite empezar de nuevo.</p><p>Una puntuación alta significa que la opción tiene menos penalizaciones conocidas; no garantiza que la calle esté libre o sea segura en ese momento.</p></div>
+        </details>
+        <details>
+          <summary>3. Entrar con un enlace mágico</summary>
           <div class="help-answer"><p>Ve a <a href="#cuenta">Cuenta</a>, escribe tu correo y pulsa <strong>Recibir enlace</strong>. Abre únicamente el mensaje más reciente y pulsa su enlace. No compartas ese enlace: permite entrar en tu cuenta.</p><p>Si caduca o ya fue utilizado, solicita uno nuevo. Revisa la carpeta de correo no deseado si tarda en llegar.</p></div>
         </details>
         <details>
-          <summary>3. Crear una aportación útil</summary>
+          <summary>4. Crear una aportación útil</summary>
           <div class="help-answer"><p>En <a href="#aportar">Aportar</a>, elige qué ocurre y la zona. Escribe un título claro y explica solo hechos que hayas comprobado. Evita nombres, teléfonos, matrículas, fotografías de personas u otros datos privados.</p><p>La aportación se enviará a moderación. No cambiará ninguna ruta hasta que otra persona la revise y publique.</p></div>
         </details>
         <details>
-          <summary>4. Señalar un punto o dibujar un camino</summary>
+          <summary>5. Señalar un punto o dibujar un camino</summary>
           <div class="help-answer"><p>Para un lugar concreto, centra el mapa y pulsa <strong>Añadir punto en el centro</strong>. Esta opción también sirve si te cuesta usar el ratón o la pantalla táctil.</p><p>Para un recorrido, pulsa <strong>Empezar dibujo</strong> y marca los puntos en orden. Usa <strong>Deshacer</strong> para quitar el último o <strong>Borrar</strong> para empezar de nuevo. Con teclado, usa el tabulador para llegar a los botones y pulsa Intro o Espacio.</p></div>
         </details>
         <details>
-          <summary>5. Revisar y enviar</summary>
+          <summary>6. Revisar y enviar</summary>
           <div class="help-answer"><p>Antes de enviar, comprueba el título, la descripción, la zona y el dibujo. Pulsa <strong>Revisar y enviar</strong> una sola vez y espera el mensaje de confirmación. Si aparece un error, conserva el texto y prueba de nuevo cuando tengas conexión.</p></div>
         </details>
         <details>
-          <summary>6. Moderar aportaciones</summary>
+          <summary>7. Moderar aportaciones</summary>
           <div class="help-answer"><p>La opción <strong>Moderar</strong> aparece únicamente a las cuentas autorizadas. El proceso es: pulsa <strong>Tomar caso</strong>, comprueba los datos y el dibujo, escribe un motivo real y elige <strong>Publicar</strong> o <strong>Rechazar</strong>. Si otro moderador ha cambiado el caso, pulsa <strong>Actualizar</strong>, si el botón está disponible, y revisa de nuevo la información antes de decidir.</p><p><strong>Ningún moderador puede aprobar su propia aportación.</strong> Las cuentas con los mismos privilegios pueden aportar y moderar, pero deben revisarse mutuamente para mantener una revisión independiente.</p></div>
         </details>
         <details>
-          <summary>7. Confirmar información de la comunidad</summary>
+          <summary>8. Confirmar información de la comunidad</summary>
           <div class="help-answer"><p>Primero entra en tu cuenta y abre una aportación publicada por otra persona. Pulsa <strong>Coincide</strong> si la información sigue siendo correcta o <strong>No coincide</strong> si lo que observas es distinto. Si ya respondiste, puedes pulsar <strong>Quitar respuesta</strong> para retirar esa valoración. No puedes valorar tu propia aportación.</p><p>Confirma solo aquello que hayas observado en el lugar y que siga siendo cierto. Si la realidad ha cambiado, crea una aportación nueva y clara para que el equipo pueda revisarla. Una confirmación no sustituye la señalización oficial.</p></div>
+        </details>
+        <details>
+          <summary>9. Ejemplo completo: informar de una barrera</summary>
+          <div class="help-answer"><ol><li>Comprueba la barrera desde un lugar seguro y recuerda la ubicación.</li><li>Entra con tu enlace mágico y abre <a href="#aportar">Aportar</a>.</li><li>Elige <strong>Barrera</strong>, selecciona la zona y escribe qué encontrará una persona.</li><li>Señala el punto en el mapa, revisa que no incluyes datos personales y envía.</li><li>La aportación queda pendiente. Otra cuenta moderadora la revisa y decide con un motivo registrado.</li><li>Si se publica y sigue vigente, el planificador puede evitar ese tramo en la opción accesible.</li></ol></div>
         </details>
       </div>
 
@@ -96,6 +168,8 @@
             <dt>En revisión</dt><dd>Un moderador está comprobando la aportación.</dd>
             <dt>Publicada</dt><dd>Aportación revisada y visible para la comunidad.</dd>
             <dt>Ruta orientativa</dt><dd>Información de ayuda que no sustituye señales, normas ni una comprobación del entorno.</dd>
+            <dt>Puntuación</dt><dd>Resumen de penalizaciones conocidas; 100 no significa seguridad garantizada.</dd>
+            <dt>Cobertura accesible</dt><dd>Porcentaje del recorrido cuya accesibilidad tiene información conocida.</dd>
           </dl>
         </section>
         <section aria-labelledby="problems-title">

@@ -1,5 +1,18 @@
 # Tareas
 
+## Bloque 29
+
+- [x] Motor Dijkstra determinista con perfiles directo y accesible.
+- [x] API anónima validada, límite de 4 KB y rate limit 30/10 min.
+- [x] Red OSM versionada e importador transaccional manual.
+- [x] Planificador visual y recorrido textual accesible.
+- [x] OpenAPI, pruebas unitarias y documentación ODbL preparadas.
+- [x] Aplicar migraciones 015-020 en Supabase.
+- [x] Ejecutar la importación OSM real y comprobar el release: 12.272 nodos y 27.620 tramos.
+- [x] Ejecutar la prueba de integración real: 26/26 en verde y rollback sin residuo.
+- [x] Preparar credibilidad pública, guía accesible ampliada y presentación comercial.
+- [ ] Publicar el Bloque 29 en `main` y comprobar el despliegue automático.
+
 ## Bloque 20
 
 - [x] Estructura independiente del proyecto.
@@ -130,5 +143,5 @@ Nada de esta segunda sección se considera implementado.
 - [x] Navegación por teclado y salto al contenido comprobados en navegador.
 - [x] Vista de 360 px comprobada: ancho de documento 345/345, tabla de 301 px y cero elementos desbordados.
 - [x] Suite local 90/90 y revisión independiente aprobada sin hallazgos pendientes.
-- [ ] Publicar el Bloque 28 y comprobarlo en la URL pública.
+- [x] Bloque 28 publicado en `main` y comprobado en la URL pública: guía visible, `health` 200 y `ready` 200.
 - [ ] Auditoría con lector de pantalla real.

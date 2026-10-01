@@ -1,15 +1,15 @@
 # RutaViva Community Sevilla
 
-> **Estado actual:** beta comunitaria pública en [rutaviva-community-sevilla-jv31.onrender.com](https://rutaviva-community-sevilla-jv31.onrender.com), conectada a Supabase Free con PostgreSQL/PostGIS. Identidad, sesiones, permisos, aportaciones geoespaciales, moderación, historial y correo funcionan con permisos mínimos.
+> **Estado actual:** beta comunitaria pública en [rutaviva-community-sevilla-jv31.onrender.com](https://rutaviva-community-sevilla-jv31.onrender.com), conectada a Supabase Free con PostgreSQL/PostGIS. El cálculo A→B, la red peatonal real y la capa pública de credibilidad están verificados localmente contra Supabase y quedan pendientes de publicación en producción.
 
 RutaViva Community está diseñada como un piloto comunitario de rutas peatonales orientativas para Sevilla. Permitirá consultar recorridos, proponer caminos o incidencias y entender por qué una alternativa ha sido recomendada. Ninguna aportación influirá en rutas públicas sin revisión.
 
 ## Estado verificable
 
-- **IMPLEMENTADO:** interfaz web responsive con MapLibre y alternativa textual; guía pública «Cómo usar RutaViva»; acceso sin contraseña; sesiones revocables; aportaciones Point/LineString; filtros; confianza determinista; reacciones; historial append-only; cola de moderación con control de versión; outbox cifrado y correo Brevo.
-- **VERIFICADO:** suite local 90/90, integración real 25/25, catorce checksums, readiness de producción, permisos del rol runtime, CSP, mapa OSM, acceso desde ordenador y móvil, navegación por teclado y vista de 360 px sin desbordamiento. La integración revierte sus datos de prueba.
-- **PROPUESTO:** motor A→B sobre una red publicada, denuncias/apelaciones, dominio propio y ampliación progresiva fuera del piloto.
-- **NO VERIFICADO:** lector de pantalla real, carga sostenida multiusuario, recorrido comunitario completo con una aportación real publicada y respuesta operativa 24/7. El plan gratuito puede dormir o pausar servicios.
+- **IMPLEMENTADO:** interfaz web responsive con MapLibre y alternativa textual; planificador A→B directo/accesible; motor Dijkstra explicable; red OSM versionada e importador transaccional; guía pública «Cómo usar RutaViva»; acceso sin contraseña; sesiones revocables; aportaciones Point/LineString; filtros; confianza determinista; reacciones; historial append-only; cola de moderación con control de versión; outbox cifrado y correo Brevo.
+- **VERIFICADO:** 20 migraciones aplicadas; release OSM `osm-20260930135906-3f4223ab` con 12.272 nodos y 27.620 tramos; `npm run check`; 122/122 pruebas locales; 26/26 de integración real; tres rutas reales consecutivas respondidas; readiness, rol runtime, CSP, estados vacíos, guía accesible y navegación en navegador local.
+- **PROPUESTO:** publicar el Bloque 29 y comprobarlo en Render; después, recorrer una aportación real con las dos cuentas autorizadas, realizar auditoría con lector de pantalla, añadir denuncias/apelaciones y ampliar progresivamente el piloto.
+- **NO VERIFICADO:** lector de pantalla real, carga sostenida multiusuario, recorrido comunitario completo con una aportación real publicada, despliegue del Bloque 29 y respuesta operativa 24/7. El plan gratuito puede dormir o pausar servicios.
 
 ## Orden de lectura
 
@@ -23,6 +23,8 @@ RutaViva Community está diseñada como un piloto comunitario de rutas peatonale
 8. `docs/RETENCION.md`
 9. `docs/REGISTRO-RIESGOS.md`
 10. `docs/DECISIONES.md`
+11. `docs/DATOS-OSM.md`
+12. `docs/PRESENTACION-COMERCIAL.md`
 
 ## Instalar, comprobar y abrir
 
@@ -67,6 +69,15 @@ Endpoints implementados:
 - `POST /api/v1/contributions/:id/withdraw`
 - `POST|DELETE /api/v1/contributions/:id/reaction`
 - `GET /api/v1/community/activity`
+- `POST /api/v1/routes/search`
+- `GET /api/v1/stats`
+- `GET /api/v1/zones/leaderboard`
+- `GET /api/v1/zones/:slug`
+- `GET /api/v1/methodology`
+- `GET /api/v1/activity/summary`
+- `GET /api/v1/openapi.json`
+- `GET /sitemap.xml`
+- `GET /robots.txt`
 - `GET /api/v1/moderation/cases`
 - `POST /api/v1/moderation/cases/:id/claim`
 - `POST /api/v1/moderation/cases/:id/publish`
@@ -83,6 +94,8 @@ La autenticación usa tokens de un solo uso de 15 minutos, UUID público más 25
 `TRUST_PROXY_HOPS=0` mantiene ignorado `X-Forwarded-For` en desarrollo y test. Producción exige exactamente `TRUST_PROXY_HOPS=1`: únicamente se confía en el proxy inmediato, nunca en una cadena abierta. Los límites actuales son tres solicitudes por correo cada 15 minutos con respuesta silenciosa, diez por red y hora con `429`, reserva global de 250 al día con `503 EMAIL_CAPACITY_EXHAUSTED`, y veinte verificaciones por red cada 15 minutos. El bucket de red se consume siempre, aunque el correo ya esté limitado; la capacidad global solo se reserva si ambos permiten encolar. El HMAC de red rota cada 48 horas UTC; en el borde de ventana la cuota puede repartirse entre dos buckets.
 
 El listado de zonas devuelve solo una caja geográfica (`bbox`), nunca el polígono completo, y usa un cursor opaco versionado. El seed identifica Sevilla y tres áreas piloto con nombres explícitamente aproximados. Las aportaciones deben quedar cubiertas por Sevilla y su zona, las líneas son simples y no superan 5 km. Un visitante anónimo ve únicamente contenido publicado; autor y moderadores tienen visibilidad adicional según rol.
+
+El planificador no guarda origen ni destino. Ajusta ambos puntos a la red publicada a un máximo de 75 metros y rechaza puntos fuera de Casco Antiguo o separados menos de 25 metros. Los cierres publicados excluyen tramos; las barreras excluyen la alternativa accesible; iluminación, incertidumbre e incidencias publicadas modifican su coste. Las aportaciones no publicadas no influyen. Un atajo nunca crea una arista nueva. Consulta `docs/DATOS-OSM.md` para procedencia, ODbL e importación manual.
 
 ## Ficha de portfolio
 

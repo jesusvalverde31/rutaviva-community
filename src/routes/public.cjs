@@ -18,13 +18,14 @@ function requireDatabase(database) {
 }
 
 function publicRoutes(app, options) {
-  const { database, config } = options;
+  const { database, config, routesRepository } = options;
 
   app.get('/api/v1/bootstrap', async request => {
     requireDatabase(database);
     try {
       const city = await getBootstrap(database);
       if (!city) throw new AppError(503, 'DATA_NOT_READY', 'Los datos públicos todavía no están preparados.');
+      const routeStatus = routesRepository ? await routesRepository.status() : { ready: false };
       return {
         service: 'rutaviva-community',
         apiVersion: 'v1',
@@ -37,9 +38,10 @@ function publicRoutes(app, options) {
           center: { latitude: city.latitude, longitude: city.longitude },
           zoneCount: city.zoneCount
         },
-        capabilities: { zones: true, routes: false, contributions: true, moderation: true, accounts: config?.emailDeliveryOperational === true },
+        capabilities: { zones: true, routes: routeStatus.ready, contributions: true, moderation: true, accounts: config?.emailDeliveryOperational === true },
         map: { tileUrl: config.mapTileUrl, attribution: '© OpenStreetMap contributors' },
-        links: { health: '/api/v1/health', ready: '/api/v1/ready', zones: '/api/v1/zones', contributions: '/api/v1/contributions', activity: '/api/v1/community/activity' },
+        links: { health: '/api/v1/health', ready: '/api/v1/ready', zones: '/api/v1/zones', routes: '/api/v1/routes/search', contributions: '/api/v1/contributions', activity: '/api/v1/community/activity' },
+        routing: routeStatus.ready ? { networkVersion: routeStatus.version, osmDate: routeStatus.osmDate } : { ready: false },
         advertencia: 'Ruta orientativa: comprueba siempre el entorno y la señalización.',
         requestId: request.id
       };
