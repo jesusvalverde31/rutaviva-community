@@ -61,6 +61,14 @@ const required = [
   , 'migrations/021_accessibility_focus.sql'
   , 'migrations/022_route_network_operator_fix.sql'
   , 'test/accessibility-focus.test.cjs'
+  , '.github/CODEOWNERS', '.github/pull_request_template.md'
+  , '.github/ISSUE_TEMPLATE/bug_report.yml', '.github/ISSUE_TEMPLATE/feature_request.yml'
+  , '.github/ISSUE_TEMPLATE/config.yml', '.github/dependabot.yml'
+  , '.github/workflows/production-smoke.yml'
+  , 'scripts/smoke-production.cjs', 'test/production-smoke.test.cjs'
+  , 'SECURITY.md', 'CONTRIBUTING.md'
+  , 'docs/OPERACION-PRODUCCION.md', 'docs/RECUPERACION-Y-ROLLBACK.md'
+  , 'docs/CHECKLIST-RELEASE.md'
 ];
 
 const secretPatterns = [
