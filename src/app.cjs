@@ -85,7 +85,11 @@ function createApp(options = {}) {
   app.get('/api/v1/ready', async (request, reply) => {
     try {
       const result = await withTimeout(readinessCheck(), readinessTimeoutMs);
-      if (!result || result.ready !== true) throw new Error('not ready');
+      if (!result || result.ready !== true) {
+        const readinessError = new Error('not ready');
+        readinessError.readinessChecks = result?.checks;
+        throw readinessError;
+      }
       return { status: 'ready', checks: result.checks || { database: 'ok' }, requestId: request.id };
     } catch (cause) {
       const readinessFailure = cause?.message === 'readiness timeout'
@@ -93,7 +97,11 @@ function createApp(options = {}) {
         : cause?.message === 'not ready'
           ? 'not_ready'
           : 'checker_error';
-      request.log.warn({ requestId: request.id, readinessFailure }, 'readiness check failed');
+      request.log.warn({
+        requestId: request.id,
+        readinessFailure,
+        ...(cause?.readinessChecks ? { readinessChecks: cause.readinessChecks } : {})
+      }, 'readiness check failed');
       reply.header('Retry-After', '5');
       throw new AppError(503, 'SERVICE_NOT_READY', 'Servicio no preparado.', { cause });
     }
