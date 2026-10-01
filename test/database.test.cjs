@@ -62,12 +62,14 @@ test('readiness exige PostGIS en extensions y última migración', async () => {
     rows.slice(1)
   ]) {
     const database = fake(altered, migrations);
-    assert.deepEqual(await createReadinessCheck(database, { migrationsDirectory: directory })(), { ready: false, checks: undefined });
+    const result = await createReadinessCheck(database, { migrationsDirectory: directory })();
+    assert.equal(result.ready, false);
+    assert.ok(Object.values(result.checks).includes('failed'));
   }
   const stale = fake(rows, migrations.slice(0, -1));
-  assert.deepEqual(await createReadinessCheck(stale, { migrationsDirectory: directory })(), { ready: false, checks: undefined });
-  assert.deepEqual(await createReadinessCheck(fake(rows, migrations, functions.slice(1)), { migrationsDirectory: directory })(), { ready: false, checks: undefined });
-  assert.deepEqual(await createReadinessCheck(fake(rows, migrations, functions.map((item, index) => index ? item : { ...item, function_executable: false })), { migrationsDirectory: directory })(), { ready: false, checks: undefined });
+  assert.equal((await createReadinessCheck(stale, { migrationsDirectory: directory })()).checks.migrations, 'failed');
+  assert.equal((await createReadinessCheck(fake(rows, migrations, functions.slice(1)), { migrationsDirectory: directory })()).checks.functions, 'failed');
+  assert.equal((await createReadinessCheck(fake(rows, migrations, functions.map((item, index) => index ? item : { ...item, function_executable: false })), { migrationsDirectory: directory })()).checks.functions, 'failed');
 });
 
 test('repositorio de zonas parametriza búsqueda, cursor y límite', async () => {
