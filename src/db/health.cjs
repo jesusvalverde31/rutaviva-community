@@ -48,6 +48,13 @@ const REQUIRED_FUNCTIONS = [
   ,'app_private.community_activity()'
   ,'app_private.get_contribution(uuid,uuid)'
   ,'app_private.list_contribution_history(uuid,uuid)'
+  ,'app_private.route_network_status()'
+  ,'app_private.get_route_network(double precision,double precision,double precision,double precision,double precision)'
+  ,'app_private.snap_route_points(uuid,double precision,double precision,double precision,double precision,double precision)'
+  ,'app_private.route_rate_limit(bytea)'
+  ,'app_private.community_stats()'
+  ,'app_private.zone_leaderboard()'
+  ,'app_private.activity_summary()'
 ];
 
 const READINESS_SQL = `
