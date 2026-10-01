@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "RutaViva Community API",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "description": "API comunitaria del piloto de rutas peatonales orientativas: cálculo A-B, aportaciones geoespaciales, reacciones, historial, moderación y acceso sin contraseña."
   },
   "servers": [{ "url": "http://127.0.0.1:4329", "description": "Desarrollo local" }],

@@ -4,7 +4,9 @@ services:
     runtime: node
     plan: free
     region: frankfurt
-    buildCommand: npm ci --omit=dev --cache .npm-cache && npm run build
+    branch: main
+    autoDeployTrigger: checksPass
+    buildCommand: npm ci --omit=dev --ignore-scripts --cache .npm-cache && npm run build
     startCommand: npm start
     healthCheckPath: /api/v1/health
     envVars:

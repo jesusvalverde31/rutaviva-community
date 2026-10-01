@@ -1,0 +1,36 @@
+name: Propuesta de mejora
+description: Sugiere una mejora centrada en una necesidad real.
+title: "[Mejora] "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema que resolvería
+      description: No incluyas datos personales ni ubicaciones privadas.
+    validations:
+      required: true
+  - type: textarea
+    id: users
+    attributes:
+      label: Personas beneficiadas
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Solución propuesta
+    validations:
+      required: true
+  - type: textarea
+    id: accessibility
+    attributes:
+      label: Consideraciones de accesibilidad y móvil
+    validations:
+      required: true
+  - type: textarea
+    id: limits
+    attributes:
+      label: Riesgos o límites conocidos
+    validations:
+      required: true

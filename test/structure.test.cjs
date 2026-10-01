@@ -16,7 +16,7 @@ const {
 const root = path.resolve(__dirname, '..');
 
 test('el proyecto contiene exactamente los archivos obligatorios declarados', () => {
-  assert.equal(required.length, 121);
+  assert.equal(required.length, 135);
   for (const file of required) assert.equal(fs.existsSync(path.join(root, file)), true, file);
   assert.deepEqual(filesIn(root), [...required].sort());
 });
@@ -93,5 +93,5 @@ test('OpenAPI documenta contratos de autenticación sin tokens de ejemplo', () =
   for (const schema of ['Stats','LeaderboardEntry','LeaderboardPage','ZoneDetail','Methodology','ActivitySummary']) assert.equal(document.components.schemas[schema].additionalProperties, false, schema);
   assert.equal(document.components.schemas.Stats.properties.publicationRate.maximum, 1);
   assert.equal(document.components.schemas.Stats.properties.privacySuppressed.type, 'boolean');
-  assert.equal(document.info.version, '0.6.0');
+  assert.equal(document.info.version, '0.7.0');
 });

@@ -26,6 +26,11 @@ RutaViva Community es un piloto de accesibilidad urbana comunitaria para Sevilla
 11. `docs/DATOS-OSM.md`
 12. `docs/PRESENTACION-COMERCIAL.md`
 13. `docs/VALIDACION-PILOTO-REAL.md`
+14. `docs/OPERACION-PRODUCCION.md`
+15. `docs/RECUPERACION-Y-ROLLBACK.md`
+16. `docs/CHECKLIST-RELEASE.md`
+17. `CONTRIBUTING.md`
+18. `SECURITY.md`
 
 ## Instalar, comprobar y abrir
 
@@ -37,10 +42,13 @@ npm run build
 npm run check
 npm test
 npm run test:integration
+npm run smoke:production
 npm start
 ```
 
 También se puede usar `ABRIR-RUTAVIVA-COMMUNITY.cmd`. El lanzador acepta únicamente `127.0.0.1`, inicia el servidor y, si se habilita, el worker de correo. No abre el navegador automáticamente.
+
+`npm run smoke:production` solo consulta mediante `GET` la portada y los endpoints públicos de salud, disponibilidad y arranque. No inicia sesión ni modifica datos. Para contribuir o comunicar una vulnerabilidad consulta `CONTRIBUTING.md` y `SECURITY.md`.
 
 Sin credenciales, consulta `http://127.0.0.1:4329/`; `ready`, `bootstrap`, `zones` y el acceso devuelven degradaciones honestas.
 

@@ -1,0 +1,54 @@
+name: Error observado
+description: Comunica un fallo reproducible sin incluir información privada.
+title: "[Error] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: No incluyas correos, enlaces de acceso, tokens, ubicaciones privadas ni capturas con datos personales.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Resumen
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para reproducirlo
+      description: Usa datos sintéticos o públicos.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Resultado esperado
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Resultado observado
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Entorno
+      placeholder: Navegador, sistema y dispositivo, sin identificadores privados
+    validations:
+      required: true
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impacto
+      options: [Bloquea el uso, Dificulta el uso, Molestia menor]
+    validations:
+      required: true
+  - type: textarea
+    id: accessibility
+    attributes:
+      label: Accesibilidad o móvil
+      description: Indica si afecta al teclado, lector de pantalla, contraste, zoom o móvil. Escribe «No observado» si no lo sabes.
+    validations:
+      required: true
