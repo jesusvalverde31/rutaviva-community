@@ -110,9 +110,17 @@ function createReadinessCheck(database, options = {}) {
     const functionsReady = functions.rows.length === REQUIRED_FUNCTIONS.length
       && functions.rows.every(row => row.function_ready === true && row.function_executable === true);
     const ready = relationsReady && roleReady && postgisReady && migrationsReady && functionsReady;
+    const checks = {
+      database: 'ok',
+      role: roleReady ? 'ok' : 'failed',
+      postgis: postgisReady ? 'ok' : 'failed',
+      migrations: migrationsReady ? 'ok' : 'failed',
+      relations: relationsReady ? 'ok' : 'failed',
+      functions: functionsReady ? 'ok' : 'failed'
+    };
     return {
       ready,
-      checks: ready ? { database: 'ok', role: 'ok', postgis: 'ok', migrations: 'ok', relations: 'ok', functions: 'ok' } : undefined
+      checks
     };
   };
 }
