@@ -1,13 +1,13 @@
 # RutaViva Community Sevilla
 
-> **Estado actual:** beta comunitaria pública en [rutaviva-community-sevilla-jv31.onrender.com](https://rutaviva-community-sevilla-jv31.onrender.com), conectada a Supabase Free con PostgreSQL/PostGIS. Esta rama añade instalación PWA y un shell estático de respaldo; queda pendiente su despliegue y comprobación pública.
+> **Estado actual:** beta comunitaria pública en [rutaviva-community-sevilla-jv31.onrender.com](https://rutaviva-community-sevilla-jv31.onrender.com), conectada a Supabase Free con PostgreSQL/PostGIS. La PWA instalable está desplegada y sus nueve recursos públicos (salud, portada y archivos PWA) se pueden revisar con el smoke GET-only. No se han verificado una instalación física, un lector de pantalla ni una sesión real completamente sin conexión.
 
 RutaViva Community es un piloto de accesibilidad urbana comunitaria para Sevilla. Permite comunicar barreras y zonas deterioradas, consultar observaciones revisadas y entender por qué una ruta orientativa intenta reducir obstáculos conocidos. Ninguna aportación influye en rutas públicas sin revisión.
 
 ## Estado verificable
 
-- **IMPLEMENTADO:** interfaz web responsive con MapLibre y alternativa textual; planificador A→B directo/accesible; motor Dijkstra explicable; red OSM versionada e importador transaccional; guía pública «Cómo usar RutaViva»; acceso sin contraseña; sesiones revocables; aportaciones Point/LineString; filtros; confianza determinista; reacciones; historial append-only; cola de moderación con control de versión; outbox cifrado y correo Brevo. Esta rama añade manifiesto PWA, iconos, instalación desde navegadores compatibles y shell estático sin datos ciudadanos sin conexión.
-- **VERIFICADO LOCALMENTE:** 22 migraciones aplicadas; release OSM `osm-20260930135906-3f4223ab` con 12.272 nodos y 27.620 tramos; `npm run check` correcto y 152/152 pruebas locales; 27/27 de integración real con rollback (ejecutada en un bloque anterior); build MapLibre 4/4; pruebas PWA cubren caché permitida, bypass de API y auth, red primero, errores HTTP y fallback al fallar red. La PWA aún espera CI, despliegue y smoke de recursos públicos.
+- **IMPLEMENTADO:** interfaz web responsive con MapLibre y alternativa textual; planificador A→B directo/accesible; motor Dijkstra explicable; red OSM versionada e importador transaccional; guía pública «Cómo usar RutaViva»; acceso sin contraseña; sesiones revocables; aportaciones Point/LineString; filtros; confianza determinista; reacciones; historial append-only; cola de moderación con control de versión; outbox cifrado y correo Brevo; manifiesto PWA, iconos, instalación desde navegadores compatibles y shell estático sin datos ciudadanos sin conexión.
+- **VERIFICADO:** Bloque 35 fusionado por PR #8; CI correcta; commit `1512cc550219fb05ba12685d2901d93bd8f29d8f` desplegado en Render (`dep-db1life0tbcc73be31kg`, Live). En local: `npm run check`, 152/152 pruebas y build MapLibre 4/4; smoke público GET-only de nueve recursos. El smoke comprueba estado, MIME y contratos básicos; no equivale a probar la instalación de la PWA en un dispositivo.
 - **PROPUESTO:** ejecutar el [primer piloto real documentado](docs/VALIDACION-PILOTO-REAL.md) con las dos cuentas autorizadas operadas por Jesús —separación técnica de funciones, no independencia humana—, realizar después una validación con personas distintas, auditar con lector de pantalla, añadir denuncias/apelaciones y ampliar progresivamente el piloto.
 - **NO VERIFICADO:** lector de pantalla real, carga sostenida multiusuario, recorrido comunitario completo con una aportación real publicada y respuesta operativa 24/7. El plan gratuito puede dormir o pausar servicios.
 
@@ -15,7 +15,7 @@ RutaViva Community es un piloto de accesibilidad urbana comunitaria para Sevilla
 
 Abre RutaViva desde su dirección HTTPS. Si el navegador ofrece «Instalar RutaViva», selecciónalo. En iPhone o iPad, abre el sitio en Safari, pulsa Compartir y elige «Añadir a pantalla de inicio». En Android, usa la opción de instalación del navegador si aparece. Los menús varían entre dispositivos.
 
-La instalación crea un acceso y permite abrir la interfaz en modo aplicación. Sin Internet no se consultan mapas, incidencias, rutas, acceso ni se envían aportaciones; la pantalla explica que el servicio no respondió y permite reintentar. No se guarda información comunitaria para verla sin conexión.
+La instalación crea un acceso y permite abrir la interfaz en modo aplicación. El shell puede servir algunos recursos estáticos en caché, pero sin conexión no se consultan mapas, incidencias, rutas ni acceso, y no se envían aportaciones. El uso offline real en un móvil no se ha verificado; no se guarda información comunitaria para verla sin conexión.
 
 ## Orden de lectura
 
@@ -54,7 +54,7 @@ npm start
 
 También se puede usar `ABRIR-RUTAVIVA-COMMUNITY.cmd`. El lanzador acepta únicamente `127.0.0.1`, inicia el servidor y, si se habilita, el worker de correo. No abre el navegador automáticamente.
 
-`npm run smoke:production` solo consulta mediante `GET` la portada y los endpoints públicos de salud, disponibilidad y arranque. No inicia sesión ni modifica datos. Para contribuir o comunicar una vulnerabilidad consulta `CONTRIBUTING.md` y `SECURITY.md`.
+`npm run smoke:production` solo consulta mediante `GET` la portada, salud, disponibilidad, arranque, manifiesto, service worker, página offline e iconos públicos. Comprueba contrato básico, estado y MIME; no inicia sesión, no toca endpoints privados, no modifica datos y no prueba una instalación física ni un flujo offline completo. Para contribuir o comunicar una vulnerabilidad consulta `CONTRIBUTING.md` y `SECURITY.md`.
 
 Sin credenciales, consulta `http://127.0.0.1:4329/`; `ready`, `bootstrap`, `zones` y el acceso devuelven degradaciones honestas.
 
@@ -135,3 +135,4 @@ La modalidad gratuita puede suspender servicios, imponer cuotas o cambiar sus co
 ## Copyright
 
 Copyright © 2026 Jesús Valverde. All rights reserved. This source code is public for portfolio review; no open-source license is granted. See `LICENSE`.
+
