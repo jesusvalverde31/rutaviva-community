@@ -11,6 +11,8 @@
   <title>RutaViva Community Sevilla</title>
   <link rel="stylesheet" href="/vendor/maplibre/maplibre-gl.css">
   <link rel="stylesheet" href="/styles.css">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icon-192.png">
   <script type="module" src="/app.js"></script>
 </head>
 <body>
@@ -20,9 +22,10 @@
     <nav aria-label="Principal"><a href="#explorar">Explorar</a><a href="#zonas">Zonas</a><a href="#aportar">Aportar</a><a href="#ayuda">Cómo usar</a><a id="moderation-nav" href="#moderar" hidden>Moderar</a><a href="#cuenta">Cuenta</a></nav>
   </header>
   <aside class="safety-banner">Ruta orientativa: comprueba siempre el entorno y la señalización.</aside>
+  <p id="connection-status" class="connection-status" role="status" aria-live="polite">Comprobando conexión…</p>
   <main id="contenido" tabindex="-1">
     <section class="hero" aria-labelledby="hero-title">
-      <div><p class="eyebrow">Sevilla · accesibilidad urbana comunitaria</p><h1 id="hero-title">Una ciudad más fácil de recorrer para todas las personas.</h1><p class="lead">Comunica obstáculos y zonas deterioradas, consulta información revisada y compara una ruta orientativa con menos barreras conocidas.</p><p class="hero-actions"><a class="button-link" href="#aportar">Comunicar una barrera</a><a class="button-link secondary-link" href="#explorar">Ver mapa de accesibilidad</a></p></div>
+      <div><p class="eyebrow">Sevilla · accesibilidad urbana comunitaria</p><h1 id="hero-title">Una ciudad más fácil de recorrer para todas las personas.</h1><p class="lead">Comunica obstáculos y zonas deterioradas, consulta información revisada y compara una ruta orientativa con menos barreras conocidas.</p><p class="hero-actions"><a class="button-link" href="#aportar">Comunicar una barrera</a><a class="button-link secondary-link" href="#explorar">Ver mapa de accesibilidad</a><button id="install-app" class="secondary" type="button" aria-describedby="pwa-status">Instalar RutaViva</button></p><p id="pwa-status" class="status" role="status" aria-live="polite">Puedes usar RutaViva desde el navegador.</p><details id="install-help" class="install-help"><summary>¿No aparece la opción automática? Ver cómo añadirla</summary><div><p><strong>Android:</strong> abre esta página en Chrome, pulsa el menú ⋮ y elige “Instalar aplicación” o “Añadir a pantalla de inicio”.</p><p><strong>iPhone o iPad:</strong> abre esta página en Safari, pulsa Compartir y elige “Añadir a pantalla de inicio”.</p><p>En otros navegadores, busca “Instalar aplicación” o “Añadir a pantalla de inicio” en el menú. La disponibilidad depende del navegador.</p></div></details></div>
       <div class="hero-stat"><strong id="hero-published">0</strong><span>aportaciones publicadas</span></div>
     </section>
     <section id="confianza" class="section" aria-labelledby="trust-title">

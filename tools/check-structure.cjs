@@ -66,6 +66,8 @@ const required = [
   , '.github/ISSUE_TEMPLATE/config.yml', '.github/dependabot.yml'
   , '.github/workflows/production-smoke.yml'
   , 'scripts/smoke-production.cjs', 'test/production-smoke.test.cjs'
+  , 'public/manifest.webmanifest', 'public/service-worker.js', 'public/offline.html'
+  , 'public/icon-192.png', 'public/icon-512.png'
   , 'SECURITY.md', 'CONTRIBUTING.md'
   , 'docs/OPERACION-PRODUCCION.md', 'docs/RECUPERACION-Y-ROLLBACK.md'
   , 'docs/CHECKLIST-RELEASE.md'
