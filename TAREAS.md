@@ -1,15 +1,23 @@
 # Tareas
 
+## Bloque 33 — CI sin avisos y mantenimiento automático
+
+- [x] **LOCAL:** actualizar `actions/checkout` y `actions/setup-node` a la versión oficial con runtime Node 24.
+- [x] **LOCAL:** fijar GitHub Actions en `ubuntu-24.04` y añadir regresiones estructurales.
+- [ ] **EXTERNO:** confirmar en GitHub la CI sin avisos de Node 20 ni migración de `ubuntu-latest`.
+- [ ] **EXTERNO:** activar y verificar Dependency Graph, Dependabot Alerts y actualizaciones de seguridad.
+- [ ] **EXTERNO:** fusionar mediante PR, comprobar Render sobre el mismo SHA y ejecutar el smoke público.
+
 ## Bloque 32 — Operación profesional
 
 - [x] Preparar versión 0.7.0 coherente, plantillas GitHub, política de seguridad y guía de contribución.
 - [x] Añadir CI concurrente, Dependabot moderado y smoke público manual de solo lectura.
 - [x] Declarar en el Blueprint rama `main` y despliegue posterior a checks correctos.
 - [x] Documentar publicación, operación, recuperación, rollback y checklist de release.
-- [ ] Publicar la rama y abrir la PR.
-- [ ] Confirmar CI verde, proteger `main` y fusionar mediante squash.
-- [ ] Verificar que Render despliega automáticamente el SHA fusionado y queda `Live`.
-- [ ] Ejecutar el smoke público desde GitHub y crear la release `v0.7.0` sobre el mismo SHA.
+- [x] Publicar la rama y abrir la PR.
+- [x] Confirmar CI verde, proteger `main` y fusionar mediante squash.
+- [x] Verificar que Render despliega automáticamente el SHA fusionado y queda `Live`.
+- [x] Ejecutar el smoke público desde GitHub y crear la release `v0.7.0` sobre el mismo SHA.
 
 ## Bloque 31 — RutaViva Accesible
 
