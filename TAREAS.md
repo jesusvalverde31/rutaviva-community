@@ -1,13 +1,23 @@
 # Tareas
 
-## Bloque 35 — PWA instalable — en curso
+## Bloque 35 — PWA instalable — completado
 
 - [x] Crear manifiesto, iconos, registro de instalación, instrucciones para Android/iOS y estado accesible de conexión.
 - [x] Añadir shell offline neutral y caché permitida de recursos propios estáticos; dejar API, autenticación, información ciudadana, mapas y orígenes externos fuera.
 - [x] Usar red primero, preservar respuestas HTTP, usar offline fallback solo en error/timeout, esperar cierre de clientes antiguos y limpiar versiones previas de caché.
 - [x] Verificar Node 24, `npm run check`, `node --check public/service-worker.js`, `npm test` 152/152 y build MapLibre 4/4.
-- [ ] Publicar PR a `main`; CI verde y fusión.
-- [ ] Confirmar despliegue Render del SHA fusionado y verificar manifiesto, iconos, service worker y smoke público.
+- [x] Publicar y fusionar la PR #8 a `main`; CI correcta.
+- [x] Verificar Render Live: despliegue `dep-db1life0tbcc73be31kg`, commit `1512cc550219fb05ba12685d2901d93bd8f29d8f`.
+- [x] Comprobar públicamente manifiesto, service worker, página offline, iconos y smoke GET-only.
+- [ ] Verificar en un móvil físico la instalación, accesibilidad con lector de pantalla y un recorrido offline real.
+
+## Bloque 36 — Smoke público de recursos PWA y cierre documental — aprobado/en curso
+
+- [x] Extender el smoke público GET-only a nueve recursos y validar status, MIME y contratos PWA sin tocar rutas privadas ni escribir datos.
+- [x] Añadir regresiones para status/MIME, manifiesto, caché del service worker y firma/dimensiones/tamaño de PNG.
+- [x] Corregir el estado del README y la guía operativa para reflejar el despliegue ya verificado y sus límites reales.
+- [x] Ejecutar checks locales (`node --check`, `npm run check`, suite `node --test`) y el smoke público de nueve rutas.
+- [ ] Publicar mediante PR, confirmar CI, fusionar y comprobar Render Live.
 
 ## Bloque 33 — CI sin avisos y mantenimiento automático
 
@@ -198,3 +208,4 @@ Nada de esta segunda sección se considera implementado.
 - [x] Suite local 90/90 y revisión independiente aprobada sin hallazgos pendientes.
 - [x] Bloque 28 publicado en `main` y comprobado en la URL pública: guía visible, `health` 200 y `ready` 200.
 - [ ] Auditoría con lector de pantalla real.
+

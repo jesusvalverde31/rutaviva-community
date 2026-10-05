@@ -14,11 +14,12 @@ La cadena prevista es: rama corta → PR → CI `verify` → fusión squash → 
 1. Completa `docs/CHECKLIST-RELEASE.md`.
 2. Fusiona solo con CI verde.
 3. Comprueba que Render muestra el SHA fusionado como `Live`.
-4. Ejecuta `npm run smoke:production` o el workflow manual `Production smoke` desde `main`.
+4. Ejecuta `npm run smoke:production` o el workflow manual `Production smoke` desde `main`. El smoke usa exclusivamente `GET` y comprueba nueve recursos públicos: `/api/v1/health`, `/api/v1/ready`, `/api/v1/bootstrap`, `/`, `/manifest.webmanifest`, `/service-worker.js`, `/offline.html`, `/icon-192.png` y `/icon-512.png`.
 5. Publica una release solo después del smoke verde.
 
-Render Free puede tardar en despertar. El smoke reintenta únicamente errores transitorios, tiene un presupuesto global máximo de cuatro minutos y nunca autentica ni modifica datos.
+Render Free puede tardar en despertar. El smoke reintenta únicamente errores transitorios, tiene un presupuesto global máximo de cuatro minutos y nunca autentica ni modifica datos. Valida status y MIME esperados, los campos básicos de instalación del manifiesto, `Cache-Control: no-cache` del service worker, la semántica/mensaje neutral de la página offline y firma, dimensiones exactas y límite de 128 KiB para ambos iconos PNG. No comprueba endpoints privados, no crea contenido, no ejecuta una instalación en móvil, no prueba un lector de pantalla ni demuestra que mapas, API o aportaciones funcionen realmente sin conexión.
 
 ## Caché instalable
 
 El service worker prioriza la red para navegación y recursos estáticos propios permitidos; solo usa la caché como respaldo ante timeout o error, y nunca cachea una respuesta fallida. Al cambiar la lista de recursos permitidos, incrementa `CACHE_NAME` en `public/service-worker.js` (por ejemplo, de `rutaviva-shell-v2` a `rutaviva-shell-v3`). El worker actualizado espera a que se cierren las pestañas controladas por la versión anterior; al activarse elimina las cachés antiguas de RutaViva. API, autenticación, recursos externos y peticiones con parámetros quedan fuera de la caché.
+
