@@ -1,15 +1,21 @@
 # RutaViva Community Sevilla
 
-> **Estado actual:** beta comunitaria pública en [rutaviva-community-sevilla-jv31.onrender.com](https://rutaviva-community-sevilla-jv31.onrender.com), conectada a Supabase Free con PostgreSQL/PostGIS. El reenfoque de accesibilidad del Bloque 31 está aplicado, verificado y desplegado; el primer piloto con una aportación real todavía no se ha ejecutado.
+> **Estado actual:** beta comunitaria pública en [rutaviva-community-sevilla-jv31.onrender.com](https://rutaviva-community-sevilla-jv31.onrender.com), conectada a Supabase Free con PostgreSQL/PostGIS. Esta rama añade instalación PWA y un shell estático de respaldo; queda pendiente su despliegue y comprobación pública.
 
 RutaViva Community es un piloto de accesibilidad urbana comunitaria para Sevilla. Permite comunicar barreras y zonas deterioradas, consultar observaciones revisadas y entender por qué una ruta orientativa intenta reducir obstáculos conocidos. Ninguna aportación influye en rutas públicas sin revisión.
 
 ## Estado verificable
 
-- **IMPLEMENTADO:** interfaz web responsive con MapLibre y alternativa textual; planificador A→B directo/accesible; motor Dijkstra explicable; red OSM versionada e importador transaccional; guía pública «Cómo usar RutaViva»; acceso sin contraseña; sesiones revocables; aportaciones Point/LineString; filtros; confianza determinista; reacciones; historial append-only; cola de moderación con control de versión; outbox cifrado y correo Brevo.
-- **VERIFICADO:** 22 migraciones aplicadas; release OSM `osm-20260930135906-3f4223ab` con 12.272 nodos y 27.620 tramos; 137/137 pruebas locales; 27/27 de integración real con rollback; resolución y reapertura idempotentes; proyección de vigencia y medición hacia rutas; `health`, `ready`, `bootstrap`, estadísticas y aportaciones en 200; portada revisada en navegador local y público. El Bloque 31 se publicó mediante la PR #4 y Render desplegó el commit `07ffd81`.
+- **IMPLEMENTADO:** interfaz web responsive con MapLibre y alternativa textual; planificador A→B directo/accesible; motor Dijkstra explicable; red OSM versionada e importador transaccional; guía pública «Cómo usar RutaViva»; acceso sin contraseña; sesiones revocables; aportaciones Point/LineString; filtros; confianza determinista; reacciones; historial append-only; cola de moderación con control de versión; outbox cifrado y correo Brevo. Esta rama añade manifiesto PWA, iconos, instalación desde navegadores compatibles y shell estático sin datos ciudadanos sin conexión.
+- **VERIFICADO LOCALMENTE:** 22 migraciones aplicadas; release OSM `osm-20260930135906-3f4223ab` con 12.272 nodos y 27.620 tramos; `npm run check` correcto y 152/152 pruebas locales; 27/27 de integración real con rollback (ejecutada en un bloque anterior); build MapLibre 4/4; pruebas PWA cubren caché permitida, bypass de API y auth, red primero, errores HTTP y fallback al fallar red. La PWA aún espera CI, despliegue y smoke de recursos públicos.
 - **PROPUESTO:** ejecutar el [primer piloto real documentado](docs/VALIDACION-PILOTO-REAL.md) con las dos cuentas autorizadas operadas por Jesús —separación técnica de funciones, no independencia humana—, realizar después una validación con personas distintas, auditar con lector de pantalla, añadir denuncias/apelaciones y ampliar progresivamente el piloto.
 - **NO VERIFICADO:** lector de pantalla real, carga sostenida multiusuario, recorrido comunitario completo con una aportación real publicada y respuesta operativa 24/7. El plan gratuito puede dormir o pausar servicios.
+
+## Instalar en el móvil
+
+Abre RutaViva desde su dirección HTTPS. Si el navegador ofrece «Instalar RutaViva», selecciónalo. En iPhone o iPad, abre el sitio en Safari, pulsa Compartir y elige «Añadir a pantalla de inicio». En Android, usa la opción de instalación del navegador si aparece. Los menús varían entre dispositivos.
+
+La instalación crea un acceso y permite abrir la interfaz en modo aplicación. Sin Internet no se consultan mapas, incidencias, rutas, acceso ni se envían aportaciones; la pantalla explica que el servicio no respondió y permite reintentar. No se guarda información comunitaria para verla sin conexión.
 
 ## Orden de lectura
 

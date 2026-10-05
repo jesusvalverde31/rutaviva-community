@@ -1,5 +1,14 @@
 # Tareas
 
+## Bloque 35 — PWA instalable — en curso
+
+- [x] Crear manifiesto, iconos, registro de instalación, instrucciones para Android/iOS y estado accesible de conexión.
+- [x] Añadir shell offline neutral y caché permitida de recursos propios estáticos; dejar API, autenticación, información ciudadana, mapas y orígenes externos fuera.
+- [x] Usar red primero, preservar respuestas HTTP, usar offline fallback solo en error/timeout, esperar cierre de clientes antiguos y limpiar versiones previas de caché.
+- [x] Verificar Node 24, `npm run check`, `node --check public/service-worker.js`, `npm test` 152/152 y build MapLibre 4/4.
+- [ ] Publicar PR a `main`; CI verde y fusión.
+- [ ] Confirmar despliegue Render del SHA fusionado y verificar manifiesto, iconos, service worker y smoke público.
+
 ## Bloque 33 — CI sin avisos y mantenimiento automático
 
 - [x] **LOCAL:** actualizar `actions/checkout` y `actions/setup-node` a la versión oficial con runtime Node 24.
