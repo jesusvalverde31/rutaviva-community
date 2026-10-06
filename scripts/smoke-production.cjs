@@ -9,6 +9,8 @@ const PWA_ICONS = [
   { path: '/icon-512.png', size: 512 }
 ];
 const MAX_RESPONSE_BYTES = 1024 * 1024;
+const EXPECTED_COMMIT_ATTEMPTS = 16;
+const EXPECTED_COMMIT_SHA = (process.env.EXPECTED_COMMIT_SHA || '').trim().toLowerCase();
 
 class SmokeResponseError extends Error {}
 
@@ -122,8 +124,31 @@ async function jsonBody(response, pathname) {
   try { return await response.json(); } catch { throw new Error(`${pathname} devolvió JSON inválido`); }
 }
 
-function validateHealth(body) {
+function validateHealth(body, expectedCommit = '') {
   if (body?.status !== 'ok' || body?.service !== 'rutaviva-community' || typeof body?.requestId !== 'string') throw new Error('/api/v1/health no cumple el contrato público');
+  if (expectedCommit) {
+    const actual = typeof body?.commit === 'string' ? body.commit.trim().toLowerCase() : '';
+    if (actual.length < 7 || !(expectedCommit.startsWith(actual) || actual.startsWith(expectedCommit))) throw new Error(`/api/v1/health todavía no sirve el commit ${expectedCommit.slice(0, 7)}`);
+  }
+}
+
+async function waitForExpectedCommit(origin, expectedCommit, options) {
+  const attempts = options.attempts ?? EXPECTED_COMMIT_ATTEMPTS;
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await request(origin, '/api/v1/health', { ...options, attempts: 1 });
+      validateHealth(await jsonBody(response, '/api/v1/health'), expectedCommit);
+      return response;
+    } catch (error) {
+      lastError = error;
+      if (attempt === attempts) throw error;
+      const remainingMs = options.deadlineAt - Date.now();
+      if (remainingMs <= 0) throw new Error('Se agotó el presupuesto global del smoke');
+      await (options.delayImpl || delay)(Math.min(options.retryDelayMs ?? 15000, remainingMs));
+    }
+  }
+  throw lastError;
 }
 
 function validateReady(body) {
@@ -173,8 +198,10 @@ async function runSmoke(options = {}) {
   const origin = options.origin || DEFAULT_ORIGIN;
   const deadlineAt = Date.now() + (options.budgetMs ?? 240000);
   const requestOptions = { fetchImpl: options.fetchImpl, attempts: options.attempts, retryDelayMs: options.retryDelayMs, timeoutMs: options.timeoutMs, delayImpl: options.delayImpl, deadlineAt };
+  const expectedCommit = (options.expectedCommit === undefined ? EXPECTED_COMMIT_SHA : options.expectedCommit).trim().toLowerCase();
+  let prefetchedHealth = expectedCommit ? await waitForExpectedCommit(origin, expectedCommit, requestOptions) : null;
   const steps = [
-    ['/api/v1/health', async response => validateHealth(await jsonBody(response, '/api/v1/health'))],
+    ['/api/v1/health', async response => validateHealth(await jsonBody(response, '/api/v1/health'), expectedCommit)],
     ['/api/v1/ready', async response => validateReady(await jsonBody(response, '/api/v1/ready'))],
     ['/api/v1/bootstrap', async response => validateBootstrap(await jsonBody(response, '/api/v1/bootstrap'))],
     ['/', async response => { requireStatus(response, '/'); requireMime(response, '/', ['text/html']); validateHtml(await response.text()); }],
@@ -186,7 +213,9 @@ async function runSmoke(options = {}) {
   ];
   for (const [pathname, validate] of steps) {
     if (Date.now() >= deadlineAt) throw new Error('Se agotó el presupuesto global del smoke');
-    await validate(await request(origin, pathname, requestOptions));
+    const response = pathname === '/api/v1/health' && prefetchedHealth ? prefetchedHealth : await request(origin, pathname, requestOptions);
+    prefetchedHealth = null;
+    await validate(response);
     if (!options.silent) console.log(`[OK] ${pathname}`);
   }
   return { ok: true, origin };
@@ -194,5 +223,5 @@ async function runSmoke(options = {}) {
 
 if (require.main === module) runSmoke().catch(error => { console.error(`[ERROR] ${error.message}`); process.exitCode = 1; });
 
-module.exports = { DEFAULT_ORIGIN, EXPECTED_READY_CHECKS, PWA_ICONS, jsonBody, request, runSmoke, validateBootstrap, validateHealth, validateHtml, validateManifest, validateOfflineHtml, validatePng, validateReady, validateServiceWorker };
+module.exports = { DEFAULT_ORIGIN, EXPECTED_COMMIT_ATTEMPTS, EXPECTED_READY_CHECKS, PWA_ICONS, jsonBody, request, runSmoke, validateBootstrap, validateHealth, validateHtml, validateManifest, validateOfflineHtml, validatePng, validateReady, validateServiceWorker, waitForExpectedCommit };
 

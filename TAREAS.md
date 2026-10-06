@@ -1,6 +1,19 @@
 # Tareas
 
-## Bloque 38 — sesiones fiables y cambio de cuenta — verificado localmente/sin publicar
+## Bloque 39 — validación real y preparación de producto — aprobado/en curso
+
+- [x] Añadir edición completa, accesible y versionada de borradores propios desde la interfaz.
+- [x] Añadir reportes de contenido con cola y decisión humanas, auditoría y prohibición de auto-revisión; un reporte nunca retira contenido automáticamente.
+- [x] Preparar Render para despliegue por commit de `main` protegido y el smoke posterior a la CI correcta, verificando el SHA servido. Falta aplicar y observar el ajuste en producción.
+- [x] Añadir un smoke funcional de sesión aislado, sin imprimir enlace, token ni cookie.
+- [ ] Ejecutar el recorrido real autorizado de enlace, recarga y cierre.
+- [ ] Verificar teclado, lector de pantalla, zoom/reflow y los flujos críticos en móvil físico.
+- [x] Verificar sintaxis, 72/72 pruebas dirigidas, 181/181 pruebas locales, build MapLibre 4/4 y `git diff --check`.
+- [x] Aplicar la migración 023, verificar una segunda ejecución sin cambios y superar 28/28 pruebas de integración real con rollback.
+- [x] Completar revisión independiente; corregir falsos errores tras mutaciones confirmadas y el cierre con Escape durante un envío. Dictamen final aprobado.
+- [ ] Crear PR, confirmar CI, fusionar, observar Render y ejecutar el smoke público ligado al SHA.
+
+## Bloque 38 — sesiones fiables y cambio de cuenta — publicado
 
 - [x] No declarar JSON en mutaciones CSRF sin cuerpo, incluido `POST /api/v1/auth/logout`.
 - [x] Bloquear pulsaciones dobles y exponer progreso, éxito y errores de cierre mediante estados accesibles.
@@ -8,7 +21,7 @@
 - [x] Explicar en el acceso y en la guía que el enlace mágico solo abre sesión en el navegador y dispositivo donde se utiliza.
 - [x] Verificación final: `npm run check`, pruebas dirigidas 33/33, suite completa 170/170 y `git diff --check` correctos. La prueba adicional mantiene visible el aviso del enlace mágico en un dominio público.
 - [x] Revisión independiente final aprobada: corregida la ocultación del aviso del enlace mágico en dominios públicos, con regresión. Límites: DOM simulado; sin prueba específica de 401, sesión real ni lector de pantalla.
-- [ ] Publicar mediante PR, confirmar CI, fusionar y comprobar Render Live.
+- [x] Publicar mediante PR #11, confirmar CI, fusionar como `a12e7101f9632094659bf110a53cdf1113908366` y comprobar Render Live en `dep-db29kk7lot8c73ed5520`.
 - [ ] Verificar en producción un cierre real de la sesión actual con autorización expresa.
 
 ## Bloque 35 — PWA instalable — completado
@@ -22,21 +35,21 @@
 - [x] Comprobar públicamente manifiesto, service worker, página offline, iconos y smoke GET-only.
 - [ ] Verificar en un móvil físico la instalación, accesibilidad con lector de pantalla y un recorrido offline real.
 
-## Bloque 36 — Smoke público de recursos PWA y cierre documental — aprobado/en curso
+## Bloque 36 — Smoke público de recursos PWA y cierre documental — completado
 
 - [x] Extender el smoke público GET-only a nueve recursos y validar status, MIME y contratos PWA sin tocar rutas privadas ni escribir datos.
 - [x] Añadir regresiones para status/MIME, manifiesto, caché del service worker y firma/dimensiones/tamaño de PNG.
 - [x] Corregir el estado del README y la guía operativa para reflejar el despliegue ya verificado y sus límites reales.
 - [x] Ejecutar checks locales (`node --check`, `npm run check`, suite `node --test`) y el smoke público de nueve rutas.
-- [ ] Publicar mediante PR, confirmar CI, fusionar y comprobar Render Live.
+- [x] Publicar mediante PR #9, confirmar CI, fusionar como `dd09631a58453010e8f068150610d4dfb18ab9ef` y comprobar Render Live.
 
 ## Bloque 33 — CI sin avisos y mantenimiento automático
 
 - [x] **LOCAL:** actualizar `actions/checkout` y `actions/setup-node` a la versión oficial con runtime Node 24.
 - [x] **LOCAL:** fijar GitHub Actions en `ubuntu-24.04` y añadir regresiones estructurales.
-- [ ] **EXTERNO:** confirmar en GitHub la CI sin avisos de Node 20 ni migración de `ubuntu-latest`.
-- [ ] **EXTERNO:** activar y verificar Dependency Graph, Dependabot Alerts y actualizaciones de seguridad.
-- [ ] **EXTERNO:** fusionar mediante PR, comprobar Render sobre el mismo SHA y ejecutar el smoke público.
+- [x] **EXTERNO:** confirmar en GitHub la CI sin avisos de Node 20 ni migración de `ubuntu-latest`.
+- [x] **EXTERNO:** activar y verificar Dependency Graph, Dependabot Alerts y actualizaciones de seguridad.
+- [x] **EXTERNO:** fusionar mediante PR #7 como `f176131ecd1ca3183b88e2c46d51e8f890d1fb2d`, desplegar manualmente el mismo SHA y ejecutar el smoke público.
 
 ## Bloque 32 — Operación profesional
 
@@ -46,7 +59,7 @@
 - [x] Documentar publicación, operación, recuperación, rollback y checklist de release.
 - [x] Publicar la rama y abrir la PR.
 - [x] Confirmar CI verde, proteger `main` y fusionar mediante squash.
-- [x] Verificar que Render despliega automáticamente el SHA fusionado y queda `Live`.
+- [x] Verificar Render `Live` sobre el SHA fusionado; los bloques posteriores detectaron que el webhook condicionado a checks requería despliegue manual y el Bloque 39 corrige ese flujo.
 - [x] Ejecutar el smoke público desde GitHub y crear la release `v0.7.0` sobre el mismo SHA.
 
 ## Bloque 31 — RutaViva Accesible
@@ -57,7 +70,7 @@
 - [x] Añadir filtros combinados, formulario guiado, confirmación de privacidad y estados textuales equivalentes al mapa.
 - [x] Aplicar una política de rutas conservadora: pendiente/resuelta no afecta; una ciudadana publicada puede penalizar, pero nunca excluye automáticamente; solo una barrera base OSM excluye en este MVP.
 - [x] Hacer resolución y reapertura idempotentes, versionadas, auditadas y prohibidas al autor; la auditoría guarda una huella, no el motivo completo.
-- [x] Permitir por API la corrección cerrada de todos los campos estructurados de un borrador; la interfaz de edición sigue pendiente.
+- [x] Permitir por API y desde la interfaz la corrección cerrada de todos los campos estructurados de un borrador.
 - [x] Aplicar migraciones 021 y 022 en Supabase; verificar 22/22 y ejecutar integración real 27/27 con rollback.
 - [ ] Medir y validar sobre el terreno el primer posible estrechamiento; la fotografía aportada no se publica.
 - [ ] Ampliar la red de rutas fuera de Casco Antiguo tras una prueba de capacidad independiente.

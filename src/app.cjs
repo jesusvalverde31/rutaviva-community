@@ -20,6 +20,8 @@ const { createRoutesRepository } = require('./db/repositories/routes.cjs');
 const { routesRoutes } = require('./routes/routes.cjs');
 const { createStatsRepository } = require('./db/repositories/stats.cjs');
 const { credibilityRoutes } = require('./routes/credibility.cjs');
+const { createReportsRepository } = require('./db/repositories/reports.cjs');
+const { reportsRoutes } = require('./routes/reports.cjs');
 
 const REDACT = ['req.headers.authorization', 'req.headers.cookie', 'req.headers["x-csrf-token"]', 'req.headers["idempotency-key"]', 'res.headers["set-cookie"]', '*.password', '*.token', '*.secret', '*.email'];
 
@@ -62,6 +64,9 @@ function createApp(options = {}) {
   const statsRepository = Object.hasOwn(options, 'statsRepository')
     ? options.statsRepository
     : (database ? createStatsRepository(database) : null);
+  const reportsRepository = Object.hasOwn(options, 'reportsRepository')
+    ? options.reportsRepository
+    : (database ? createReportsRepository(database) : null);
   const readinessTimeoutMs = options.readinessTimeoutMs || 1000;
   const app = Fastify({
     logger: options.logger === undefined ? { level: config.logLevel, redact: REDACT } : options.logger,
@@ -80,7 +85,12 @@ function createApp(options = {}) {
     app.addHook('onClose', async () => database.end());
   }
 
-  app.get('/api/v1/health', async request => ({ status: 'ok', service: 'rutaviva-community', requestId: request.id }));
+  app.get('/api/v1/health', async request => {
+    const commit = typeof process.env.RENDER_GIT_COMMIT === 'string' && /^[0-9a-f]{7,40}$/i.test(process.env.RENDER_GIT_COMMIT.trim())
+      ? process.env.RENDER_GIT_COMMIT.trim().toLowerCase().slice(0, 12)
+      : undefined;
+    return { status: 'ok', service: 'rutaviva-community', ...(commit ? { commit } : {}), requestId: request.id };
+  });
 
   app.get('/api/v1/ready', async (request, reply) => {
     try {
@@ -126,6 +136,7 @@ function createApp(options = {}) {
     authService,
     config
   });
+  reportsRoutes(app, { repository: reportsRepository, authService, config });
   routesRoutes(app, { repository: routesRepository, config, rateLimiter: options.routeRateLimiter });
   credibilityRoutes(app, { database, config, statsRepository });
 

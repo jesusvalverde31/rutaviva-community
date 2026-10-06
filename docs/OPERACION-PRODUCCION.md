@@ -1,6 +1,6 @@
 # Operación de producción
 
-La cadena prevista es: rama corta → PR → CI `verify` → fusión squash → Render → smoke público → release.
+La cadena es: rama corta → PR → CI `verify` obligatoria → fusión squash en `main` protegido → Render por commit → CI de `main` → smoke público automático con comprobación del SHA → release.
 
 ## Comprobación diaria
 
@@ -13,11 +13,11 @@ La cadena prevista es: rama corta → PR → CI `verify` → fusión squash → 
 
 1. Completa `docs/CHECKLIST-RELEASE.md`.
 2. Fusiona solo con CI verde.
-3. Comprueba que Render muestra el SHA fusionado como `Live`.
-4. Ejecuta `npm run smoke:production` o el workflow manual `Production smoke` desde `main`. El smoke usa exclusivamente `GET` y comprueba nueve recursos públicos: `/api/v1/health`, `/api/v1/ready`, `/api/v1/bootstrap`, `/`, `/manifest.webmanifest`, `/service-worker.js`, `/offline.html`, `/icon-192.png` y `/icon-512.png`.
+3. Render recibe cada commit fusionado de `main`; la rama exige PR y `verify` correcto antes de aceptar la fusión.
+4. Al terminar correctamente la CI de `main`, `Production smoke` se ejecuta automáticamente y exige que `/api/v1/health` sirva ese mismo SHA. También puede iniciarse manualmente. El smoke usa exclusivamente `GET` y comprueba nueve recursos públicos: `/api/v1/health`, `/api/v1/ready`, `/api/v1/bootstrap`, `/`, `/manifest.webmanifest`, `/service-worker.js`, `/offline.html`, `/icon-192.png` y `/icon-512.png`.
 5. Publica una release solo después del smoke verde.
 
-Render Free puede tardar en despertar. El smoke reintenta únicamente errores transitorios, tiene un presupuesto global máximo de cuatro minutos y nunca autentica ni modifica datos. Valida status y MIME esperados, los campos básicos de instalación del manifiesto, `Cache-Control: no-cache` del service worker, la semántica/mensaje neutral de la página offline y firma, dimensiones exactas y límite de 128 KiB para ambos iconos PNG. No comprueba endpoints privados, no crea contenido, no ejecuta una instalación en móvil, no prueba un lector de pantalla ni demuestra que mapas, API o aportaciones funcionen realmente sin conexión.
+Render Free puede tardar en despertar. El smoke espera el SHA objetivo y reintenta errores transitorios dentro de un presupuesto global máximo de cuatro minutos; nunca autentica ni modifica datos. Valida status y MIME esperados, los campos básicos de instalación del manifiesto, `Cache-Control: no-cache` del service worker, la semántica/mensaje neutral de la página offline y firma, dimensiones exactas y límite de 128 KiB para ambos iconos PNG. No comprueba endpoints privados, no crea contenido, no ejecuta una instalación en móvil, no prueba un lector de pantalla ni demuestra que mapas, API o aportaciones funcionen realmente sin conexión.
 
 ## Sesiones y enlaces mágicos
 

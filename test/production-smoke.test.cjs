@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { request, runSmoke } = require('../scripts/smoke-production.cjs');
+const { EXPECTED_COMMIT_ATTEMPTS, request, runSmoke } = require('../scripts/smoke-production.cjs');
 
 const iconPaths = ['/icon-192.png', '/icon-512.png'];
 const expectedPaths = ['/api/v1/health', '/api/v1/ready', '/api/v1/bootstrap', '/', '/manifest.webmanifest', '/service-worker.js', '/offline.html', ...iconPaths];
@@ -58,6 +58,20 @@ test('smoke valida nueve recursos públicos con GET y no solicita rutas privadas
   assert.deepEqual(requests.map(item => item.pathname), expectedPaths);
   assert.ok(requests.every(item => item.method === 'GET'));
   assert.ok(requests.every(item => !item.pathname.startsWith('/api/v1/auth') && !item.pathname.startsWith('/api/v1/moderation') && !item.pathname.startsWith('/api/v1/contributions')));
+});
+
+test('smoke espera hasta que producción sirve el commit fusionado esperado', async () => {
+  assert.equal(EXPECTED_COMMIT_ATTEMPTS, 16);
+  let healthCalls = 0;
+  await runSmoke({ silent:true, attempts:3, retryDelayMs:0, delayImpl:async()=>{}, expectedCommit:'abcdef1234567890', fetchImpl:async(url,options)=>{
+    const pathname=new URL(url).pathname;
+    if(pathname==='/api/v1/health'){
+      healthCalls+=1;
+      return response(200,{...payloads[pathname],commit:healthCalls===1?'1111111':'abcdef1234567890'});
+    }
+    return successfulFetch(url,options);
+  }});
+  assert.equal(healthCalls,2);
 });
 
 test('reintenta un 503 transitorio y después continúa', async () => {

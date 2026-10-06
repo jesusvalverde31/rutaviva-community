@@ -4,7 +4,13 @@
 
 `POST /api/v1/contributions` acepta de forma conjunta `conditionType`, `affectedGroups`, `observedOn`, `permanence`, `measurementStatus`, `clearWidthCm` y `personalDataConfirmed=true`. Solo un atajo histórico puede conservar el cuerpo anterior; cualquier nueva observación de accesibilidad exige el conjunto completo. `GET /api/v1/contributions` añade filtros combinables `conditionType`, `lifecycle` y `affectedGroup`. La respuesta sanitizada expone condición, grupos potencialmente afectados, medición y ciclo, pero nunca datos de identidad.
 
-`PATCH /api/v1/contributions/:id` corrige un borrador propio con control de versión. Para una observación accesible recibe juntos `kind`, geometría y todos los campos estructurados; el esquema es cerrado y la base vuelve a validar sus combinaciones. La interfaz web aún no incluye edición visual. `POST /api/v1/moderation/contributions/:id/resolve` y `/reopen` requieren `Idempotency-Key`, versión y motivo de 3 a 300 caracteres; replay exacto devuelve el mismo resultado, mientras reutilizar la clave con otro payload responde conflicto.
+`PATCH /api/v1/contributions/:id` corrige un borrador propio con control de versión. Para una observación accesible recibe juntos `zoneId`, `kind`, geometría y todos los campos estructurados; el esquema es cerrado y la base vuelve a validar sus combinaciones. La interfaz carga las observaciones estructuradas en el formulario y conserva la geometría cuando el mapa no está disponible. Los atajos históricos siguen usando la variante heredada de título, descripción y geometría y no se convierten desde el editor estructurado. `POST /api/v1/moderation/contributions/:id/resolve` y `/reopen` requieren `Idempotency-Key`, versión y motivo de 3 a 300 caracteres; replay exacto devuelve el mismo resultado, mientras reutilizar la clave con otro payload responde conflicto.
+
+## Reportes de contenido — Bloque 39
+
+`POST /api/v1/contributions/:id/reports` exige sesión, `Origin`, CSRF e `Idempotency-Key`. Acepta una de cinco razones cerradas y un detalle opcional de hasta 500 caracteres. Solo admite aportaciones publicadas, limita a diez reportes por cuenta y 24 horas y conserva un único reporte pendiente de la misma cuenta sobre la misma aportación. Crearlo nunca modifica ni retira la aportación.
+
+`GET /api/v1/moderation/reports?status=pending|resolved|dismissed&limit=` devuelve una cola privada sin identidad del reportante. Excluye los reportes creados por la propia cuenta moderadora y los relativos a contenido de su autoría. `POST /api/v1/moderation/reports/:id/dismiss` y `/resolve` exigen versión, motivo de 3 a 300 caracteres, CSRF e idempotencia. `dismiss` mantiene la publicación; `resolve` la retira tras decisión humana independiente.
 
 ## `POST /api/v1/routes/search`
 
@@ -46,7 +52,7 @@ Las respuestas usan `ETag` y caché pública acotada. Si un grupo tiene entre un
 | Flujo | `POST /contributions/:id/submit|withdraw`, `POST /contributions/:id/revisions` | Transiciones explícitas |
 | Señales | `POST /contributions/:id/confirm|reject`, `DELETE /contributions/:id/reaction` | Verificado, no contenido propio |
 | Incidencias | `GET/POST /incidents`, `GET /incidents/:id` | Crear genera aportación pendiente |
-| Denuncias | `POST /reports`, `GET /reports/:id`, `POST /moderation/decisions/:id/appeals` | Verificado; notas internas ocultas |
+| Reportes | `POST /contributions/:id/reports`, `GET /moderation/reports`, decisiones `dismiss|resolve` | Cuenta autenticada; cola privada y revisión humana independiente |
 | Moderación | `GET /moderation/cases`, acciones `claim`, `publish`, `reject`, `hide`, `resolve-appeal` | Moderador sin conflicto de interés |
 | Administración | usuarios, roles, importaciones, jobs y auditoría | Administrador y reautenticación |
 

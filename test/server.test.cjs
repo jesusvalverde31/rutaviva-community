@@ -14,6 +14,8 @@ async function withApp(options, run) {
   try { await run(app); } finally { await app.close(); }
 }
 
+test('health expone SHA corto normalizado solo con un commit válido de Render',async()=>{const previous=process.env.RENDER_GIT_COMMIT;process.env.RENDER_GIT_COMMIT='ABCDEF1234567890ABCDEF1234567890ABCDEF12';try{await withApp({},async app=>{const response=await app.inject({method:'GET',url:'/api/v1/health',headers});assert.equal(response.statusCode,200);assert.equal(response.json().commit,'abcdef123456');});process.env.RENDER_GIT_COMMIT='not-a-commit';await withApp({},async app=>{const response=await app.inject({method:'GET',url:'/api/v1/health',headers});assert.equal(Object.hasOwn(response.json(),'commit'),false);});}finally{if(previous===undefined)delete process.env.RENDER_GIT_COMMIT;else process.env.RENDER_GIT_COMMIT=previous;}});
+
 test('health confirma vida sin ejecutar readiness', async () => {
   let calls = 0;
   await withApp({ readinessCheck: async () => { calls += 1; return { ready: true }; } }, async app => {

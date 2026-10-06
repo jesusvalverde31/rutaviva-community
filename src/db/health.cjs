@@ -26,7 +26,9 @@ const REQUIRED_RELATIONS = [
   'app_private.contribution_history',
   'app_private.moderation_cases',
   'app_private.moderation_decisions',
-  'app_private.contribution_lifecycle_requests'
+  'app_private.contribution_lifecycle_requests',
+  'app_private.content_reports',
+  'app_private.content_report_decision_requests'
 ];
 
 const REQUIRED_FUNCTIONS = [
@@ -57,10 +59,13 @@ const REQUIRED_FUNCTIONS = [
   ,'app_private.zone_leaderboard()'
   ,'app_private.activity_summary()'
   ,'app_private.create_accessibility_contribution(uuid,uuid,uuid,uuid,text,text,text,jsonb,text,text[],date,text,text,integer,boolean,uuid)'
-  ,'app_private.update_accessibility_contribution(uuid,uuid,bigint,text,text,text,jsonb,text,text[],date,text,text,integer,boolean,uuid)'
+  ,'app_private.update_accessibility_contribution(uuid,uuid,bigint,uuid,text,text,text,jsonb,text,text[],date,text,text,integer,boolean,uuid)'
   ,'app_private.list_accessibility_contributions(uuid,text,text,text,text,text,text,integer)'
   ,'app_private.get_accessibility_contribution(uuid,uuid)'
   ,'app_private.set_accessibility_lifecycle(uuid,uuid,bigint,text,text,uuid,bytea)'
+  ,'app_private.create_content_report(uuid,uuid,uuid,text,text,bytea,uuid)'
+  ,'app_private.list_content_reports(uuid,text,integer)'
+  ,'app_private.decide_content_report(uuid,uuid,bigint,text,text,uuid,bytea,uuid)'
 ];
 
 const READINESS_SQL = `

@@ -7,10 +7,10 @@ RutaViva Community es un piloto de accesibilidad urbana comunitaria para Sevilla
 ## Estado verificable
 
 - **IMPLEMENTADO:** interfaz web responsive con MapLibre y alternativa textual; planificador A→B directo/accesible; motor Dijkstra explicable; red OSM versionada e importador transaccional; guía pública «Cómo usar RutaViva»; acceso sin contraseña; sesiones revocables; aportaciones Point/LineString; filtros; confianza determinista; reacciones; historial append-only; cola de moderación con control de versión; outbox cifrado y correo Brevo; manifiesto PWA, iconos, instalación desde navegadores compatibles y shell estático sin datos ciudadanos sin conexión.
-- **IMPLEMENTADO EN B38, PENDIENTE DE PUBLICAR:** cierre de sesión sin cuerpo JSON artificial, bloqueo de pulsaciones dobles, estados accesibles de progreso/error y explicación visible de que el enlace mágico solo inicia sesión en el navegador y dispositivo donde se abre.
-- **VERIFICADO EN LOCAL PARA B38:** `npm run check`, 33/33 pruebas dirigidas de autenticación/frontend y suite completa 170/170. La verificación pública real del cierre queda pendiente hasta publicar y probar una sesión autorizada.
+- **PUBLICADO EN B38:** cierre de sesión sin cuerpo JSON artificial, bloqueo de pulsaciones dobles, estados accesibles de progreso/error y explicación visible de que el enlace mágico solo inicia sesión en el navegador y dispositivo donde se abre. PR #11, commit `a12e7101f9632094659bf110a53cdf1113908366`, CI correcta y despliegue Render `dep-db29kk7lot8c73ed5520` Live sobre el mismo SHA.
+- **VERIFICADO EN B38:** `npm run check`, 33/33 pruebas dirigidas de autenticación/frontend, suite completa 170/170, build MapLibre 4/4 y smoke público 9/9. Continúa pendiente el recorrido de sesión con una cuenta real autorizada.
 - **VERIFICADO:** Bloque 35 fusionado por PR #8; CI correcta; commit `1512cc550219fb05ba12685d2901d93bd8f29d8f` desplegado en Render (`dep-db1life0tbcc73be31kg`, Live). En local: `npm run check`, 152/152 pruebas y build MapLibre 4/4; smoke público GET-only de nueve recursos. El smoke comprueba estado, MIME y contratos básicos; no equivale a probar la instalación de la PWA en un dispositivo.
-- **PROPUESTO:** ejecutar el [primer piloto real documentado](docs/VALIDACION-PILOTO-REAL.md) con las dos cuentas autorizadas operadas por Jesús —separación técnica de funciones, no independencia humana—, realizar después una validación con personas distintas, auditar con lector de pantalla, añadir denuncias/apelaciones y ampliar progresivamente el piloto.
+- **EN VALIDACIÓN EXTERNA, BLOQUE 39:** la candidata permite editar borradores estructurados desde la interfaz y reportar contenido publicado para una revisión humana independiente, sin retirada automática. La migración 023 está aplicada e idempotente; la integración real pasó 28/28, la suite local 184/184 y la revisión independiente quedó aprobada. También prepara el despliegue por cada commit fusionado en `main` y un smoke que espera el SHA exacto. Quedan publicación y comprobaciones físicas de sesión, lector de pantalla y móvil. Después se ejecutará el [primer piloto real documentado](docs/VALIDACION-PILOTO-REAL.md) con personas distintas antes de ampliar progresivamente el público.
 - **NO VERIFICADO:** lector de pantalla real, carga sostenida multiusuario, recorrido comunitario completo con una aportación real publicada y respuesta operativa 24/7. El plan gratuito puede dormir o pausar servicios.
 
 ## Instalar en el móvil
@@ -82,6 +82,7 @@ Endpoints implementados:
 - `GET|POST /api/v1/contributions`
 - `GET|PATCH /api/v1/contributions/:id`
 - `GET /api/v1/contributions/:id/history`
+- `POST /api/v1/contributions/:id/reports`
 - `POST /api/v1/contributions/:id/submit`
 - `POST /api/v1/contributions/:id/withdraw`
 - `POST|DELETE /api/v1/contributions/:id/reaction`
@@ -101,12 +102,17 @@ Endpoints implementados:
 - `POST /api/v1/moderation/cases/:id/reject`
 - `POST /api/v1/moderation/contributions/:id/resolve`
 - `POST /api/v1/moderation/contributions/:id/reopen`
+- `GET /api/v1/moderation/reports`
+- `POST /api/v1/moderation/reports/:id/dismiss`
+- `POST /api/v1/moderation/reports/:id/resolve`
 - `GET /`
 - `GET /auth/verify`
 
 La autenticación usa tokens de un solo uso de 15 minutos, UUID público más 256 bits aleatorios, hashes persistidos, cifrado AES-256-GCM para correo y outbox, máximo cinco sesiones activas y cookies opacas. El worker reclama con `SKIP LOCKED` y lease limitado. Solo un rechazo explícito `429` se reintenta con backoff de 1, 5, 15 y 60 minutos; red, timeout, `408`, `5xx`, respuesta inválida, pérdida de lease o fallo tras aceptación quedan terminales como resultado desconocido para evitar reenvío automático. Solo persiste el hash del identificador devuelto por el proveedor. El runtime conserva cero `SELECT` o DML sobre las tablas privadas.
 
-La resolución y la reapertura exigen `Idempotency-Key`, versión vigente, motivo de 3 a 300 caracteres y una cuenta moderadora distinta de la autora. El historial conserva la acción; la auditoría guarda solo la huella del motivo. `PATCH /api/v1/contributions/:id` permite corregir por API todos los campos estructurados mientras el registro siga en borrador. La interfaz pública todavía no ofrece ese formulario de edición.
+La resolución y la reapertura exigen `Idempotency-Key`, versión vigente, motivo de 3 a 300 caracteres y una cuenta moderadora distinta de la autora. El historial conserva la acción; la auditoría guarda solo la huella del motivo. `PATCH /api/v1/contributions/:id` permite corregir todos los campos estructurados mientras el registro siga en borrador; la interfaz reutiliza el formulario accesible para las observaciones estructuradas, conserva la versión y pide confirmación antes de descartar cambios. Los atajos históricos conservan su flujo heredado y no se convierten de categoría desde ese editor.
+
+Una cuenta autenticada puede reportar una aportación publicada mediante una razón cerrada y un detalle opcional. El reporte queda privado y pendiente: no cambia por sí mismo el estado ni el cálculo de rutas. La cola oculta la identidad de quien reporta y excluye al autor y al reportante de la revisión. Una cuenta moderadora independiente puede descartar el reporte o resolverlo; solo esta última decisión humana retira la aportación publicada. Las decisiones exigen versión, motivo e idempotencia y quedan auditadas sin guardar el texto del motivo en el evento de auditoría.
 
 `EMAIL_PROVIDER=disabled` es el modo seguro por defecto. Las cuentas solo se anuncian y `request-link` solo persiste cuando están configurados base, los cuatro secretos de autenticación y un proveedor Brevo real. Una activación aprobada requiere `EMAIL_PROVIDER=brevo`, una `BREVO_API_KEY` privada y `BREVO_SENDER` verificado. `fake` solo está permitido con `NODE_ENV=test`. El cliente usa `fetch`, `AbortController`, HTML y texto sin recursos remotos e `idempotencyKey`; esta señal no se considera garantía de deduplicación. En el Bloque 25 se verificaron dos entregas reales, ambas aceptadas en el primer intento, sin probar una respuesta ambigua ni la deduplicación del proveedor.
 

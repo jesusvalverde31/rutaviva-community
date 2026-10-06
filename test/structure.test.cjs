@@ -16,7 +16,7 @@ const {
 const root = path.resolve(__dirname, '..');
 
 test('el proyecto contiene exactamente los archivos obligatorios declarados', () => {
-  assert.equal(required.length, 140);
+  assert.equal(required.length, 147);
   for (const file of required) assert.equal(fs.existsSync(path.join(root, file)), true, file);
   assert.deepEqual(filesIn(root), [...required].sort());
 });
@@ -87,11 +87,14 @@ test('OpenAPI documenta contratos de autenticación sin tokens de ejemplo', () =
   assert.equal(document.components.schemas.User.properties.version.minimum, 1);
   assert.equal(Object.hasOwn(document.paths['/api/v1/auth/logout'].post.responses, '401'), false);
   assert.equal(Object.hasOwn(document.components.schemas.TokenRequest.properties.token, 'example'), false);
-  for (const route of ['/api/v1/contributions','/api/v1/contributions/{id}','/api/v1/contributions/{id}/history','/api/v1/community/activity','/api/v1/moderation/cases','/api/v1/moderation/cases/{id}/publish']) assert.ok(document.paths[route], route);
+  for (const route of ['/api/v1/contributions','/api/v1/contributions/{id}','/api/v1/contributions/{id}/history','/api/v1/contributions/{id}/reports','/api/v1/community/activity','/api/v1/moderation/cases','/api/v1/moderation/cases/{id}/publish','/api/v1/moderation/reports','/api/v1/moderation/reports/{id}/dismiss','/api/v1/moderation/reports/{id}/resolve']) assert.ok(document.paths[route], route);
   assert.ok(document.paths['/api/v1/routes/search']);
   for (const route of ['/api/v1/stats','/api/v1/zones/leaderboard','/api/v1/zones/{slug}','/api/v1/methodology','/api/v1/activity/summary']) assert.ok(document.paths[route], route);
   for (const schema of ['Stats','LeaderboardEntry','LeaderboardPage','ZoneDetail','Methodology','ActivitySummary']) assert.equal(document.components.schemas[schema].additionalProperties, false, schema);
   assert.equal(document.components.schemas.Stats.properties.publicationRate.maximum, 1);
   assert.equal(document.components.schemas.Stats.properties.privacySuppressed.type, 'boolean');
-  assert.equal(document.info.version, '0.7.0');
+  assert.equal(document.components.schemas.ContributionUpdate.oneOf[1].properties.zoneId.format, 'uuid');
+  assert.equal(document.components.schemas.ReportInput.additionalProperties, false);
+  assert.equal(document.components.schemas.Health.properties.commit.pattern, '^[0-9a-f]{7,12}$');
+  assert.equal(document.info.version, '0.8.0');
 });
