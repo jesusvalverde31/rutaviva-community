@@ -122,6 +122,7 @@ test('entorno runtime aplica allowlist, precedencia del shell y separación del 
   ].join('\n'));
   const runtime = createRuntimeEnvironment({ fileEnv, parentEnv: {
     Path: 'synthetic-path', PORT: '4331', PUBLIC_ORIGIN: 'http://127.0.0.1:4331',
+    RENDER_GIT_COMMIT: 'abcdef1234567890abcdef1234567890abcdef12',
     MIGRATION_DATABASE_URL: migratorUrl, UNRELATED_SECRET: 'shell-private',
     NODE_OPTIONS: '--require=not-allowed.cjs'
   } });
@@ -129,6 +130,7 @@ test('entorno runtime aplica allowlist, precedencia del shell y separación del 
   assert.equal(runtime.PUBLIC_ORIGIN, 'http://127.0.0.1:4331');
   assert.equal(runtime.PATH, 'synthetic-path');
   assert.equal(runtime.DATABASE_URL, runtimeUrl);
+  assert.equal(runtime.RENDER_GIT_COMMIT, 'abcdef1234567890abcdef1234567890abcdef12');
   assert.equal(Object.hasOwn(runtime, 'MIGRATION_DATABASE_URL'), false);
   assert.equal(Object.hasOwn(runtime, 'UNRELATED_SECRET'), false);
   assert.equal(Object.hasOwn(runtime, 'NODE_OPTIONS'), false);
@@ -145,6 +147,7 @@ test('entorno runtime aplica allowlist, precedencia del shell y separación del 
       envFile: path.join(__dirname, '.runtime-env-does-not-exist'),
       parentEnv: {
         Path: 'synthetic-path', NODE_ENV: 'test', HOST: '127.0.0.1', PORT: '4329',
+        RENDER_GIT_COMMIT: 'abcdef1234567890abcdef1234567890abcdef12',
         PUBLIC_ORIGIN: 'http://127.0.0.1:4329', EMAIL_PROVIDER: 'fake', DATABASE_URL: runtimeUrl,
         MIGRATION_DATABASE_URL: migratorUrl, UNRELATED_SECRET: 'shell-private',
         NODE_OPTIONS: '--require=not-allowed.cjs'
@@ -158,11 +161,13 @@ test('entorno runtime aplica allowlist, precedencia del shell y separación del 
   assert.equal(Object.hasOwn(target, 'UNRELATED_SECRET'), false);
   assert.equal(Object.hasOwn(target, 'NODE_OPTIONS'), false);
   assert.equal(loadConfig(target).migrationDatabaseConfigured, false);
+  assert.equal(target.RENDER_GIT_COMMIT, 'abcdef1234567890abcdef1234567890abcdef12');
   assert.equal(spawned.length, 2);
   for (const childEnv of spawned) {
     assert.equal(Object.hasOwn(childEnv, 'MIGRATION_DATABASE_URL'), false);
     assert.equal(Object.hasOwn(childEnv, 'UNRELATED_SECRET'), false);
     assert.equal(Object.hasOwn(childEnv, 'NODE_OPTIONS'), false);
+    assert.equal(childEnv.RENDER_GIT_COMMIT, 'abcdef1234567890abcdef1234567890abcdef12');
     assert.equal(loadConfig(childEnv).migrationDatabaseConfigured, false);
   }
 });
