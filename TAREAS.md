@@ -1,17 +1,18 @@
 # Tareas
 
-## Bloque 39 — validación real y preparación de producto — aprobado/en curso
+## Bloque 39 — validación real y preparación de producto — publicado/en cierre
 
 - [x] Añadir edición completa, accesible y versionada de borradores propios desde la interfaz.
 - [x] Añadir reportes de contenido con cola y decisión humanas, auditoría y prohibición de auto-revisión; un reporte nunca retira contenido automáticamente.
-- [x] Preparar Render para despliegue por commit de `main` protegido y el smoke posterior a la CI correcta, verificando el SHA servido. Falta aplicar y observar el ajuste en producción.
+- [x] Preparar y aplicar en Render el despliegue por commit de `main` protegido y el smoke posterior a la CI correcta, verificando el SHA servido.
 - [x] Añadir un smoke funcional de sesión aislado, sin imprimir enlace, token ni cookie.
 - [ ] Ejecutar el recorrido real autorizado de enlace, recarga y cierre.
 - [ ] Verificar teclado, lector de pantalla, zoom/reflow y los flujos críticos en móvil físico.
-- [x] Verificar sintaxis, 72/72 pruebas dirigidas, 181/181 pruebas locales, build MapLibre 4/4 y `git diff --check`.
+- [x] Verificar sintaxis, 72/72 pruebas dirigidas, 184/184 pruebas locales, build MapLibre 4/4 y `git diff --check`.
 - [x] Aplicar la migración 023, verificar una segunda ejecución sin cambios y superar 28/28 pruebas de integración real con rollback.
 - [x] Completar revisión independiente; corregir falsos errores tras mutaciones confirmadas y el cierre con Escape durante un envío. Dictamen final aprobado.
-- [ ] Crear PR, confirmar CI, fusionar, observar Render y ejecutar el smoke público ligado al SHA.
+- [x] Publicar la funcionalidad mediante PR #12, confirmar CI, fusionar como `a170f3d047207a7810e51f12c4d6f3cfed9c5f76` y observar Render Live en `dep-db2c2te0tbcc738n6reg`.
+- [x] Aislar la concurrencia del smoke por rama para que una ejecución omitida de otra rama no cancele la comprobación válida de `main`, con regresión ejecutable.
 
 ## Bloque 38 — sesiones fiables y cambio de cuenta — publicado
 
