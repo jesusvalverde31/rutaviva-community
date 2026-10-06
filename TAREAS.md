@@ -1,5 +1,16 @@
 # Tareas
 
+## Bloque 38 — sesiones fiables y cambio de cuenta — verificado localmente/sin publicar
+
+- [x] No declarar JSON en mutaciones CSRF sin cuerpo, incluido `POST /api/v1/auth/logout`.
+- [x] Bloquear pulsaciones dobles y exponer progreso, éxito y errores de cierre mediante estados accesibles.
+- [x] Separar el cierre correcto del refresco posterior de aportaciones para evitar falsos errores.
+- [x] Explicar en el acceso y en la guía que el enlace mágico solo abre sesión en el navegador y dispositivo donde se utiliza.
+- [x] Verificación final: `npm run check`, pruebas dirigidas 33/33, suite completa 170/170 y `git diff --check` correctos. La prueba adicional mantiene visible el aviso del enlace mágico en un dominio público.
+- [x] Revisión independiente final aprobada: corregida la ocultación del aviso del enlace mágico en dominios públicos, con regresión. Límites: DOM simulado; sin prueba específica de 401, sesión real ni lector de pantalla.
+- [ ] Publicar mediante PR, confirmar CI, fusionar y comprobar Render Live.
+- [ ] Verificar en producción un cierre real de la sesión actual con autorización expresa.
+
 ## Bloque 35 — PWA instalable — completado
 
 - [x] Crear manifiesto, iconos, registro de instalación, instrucciones para Android/iOS y estado accesible de conexión.
