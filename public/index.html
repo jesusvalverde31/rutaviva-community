@@ -137,7 +137,7 @@
         </details>
         <details>
           <summary>3. Entrar con un enlace mágico</summary>
-          <div class="help-answer"><p>Ve a <a href="#cuenta">Cuenta</a>, escribe tu correo y pulsa <strong>Recibir enlace</strong>. Abre únicamente el mensaje más reciente y pulsa su enlace. No compartas ese enlace: permite entrar en tu cuenta.</p><p>Si caduca o ya fue utilizado, solicita uno nuevo. Revisa la carpeta de correo no deseado si tarda en llegar.</p></div>
+          <div class="help-answer"><p>Ve a <a href="#cuenta">Cuenta</a>, escribe tu correo y pulsa <strong>Recibir enlace</strong>. Abre únicamente el mensaje más reciente y pulsa su enlace.</p><p>El enlace inicia sesión únicamente en el navegador y dispositivo donde lo abras. Si lo abres en el móvil, la sesión quedará abierta en el móvil, no en este ordenador. No compartas el enlace.</p><p>Si caduca o ya fue utilizado, solicita uno nuevo. Revisa la carpeta de correo no deseado si tarda en llegar.</p></div>
         </details>
         <details>
           <summary>4. Crear una aportación útil</summary>
@@ -212,9 +212,9 @@
       <p id="moderation-status" class="status" role="status"></p><ul id="moderation-list" class="contribution-list"></ul>
     </section>
     <section id="cuenta" class="section account-grid" aria-labelledby="account-heading">
-      <div id="access-section" class="card"><h2 id="account-heading">Entrar con un enlace</h2><p>No necesitas contraseña.</p><form id="access-form" novalidate hidden><label for="email">Correo electrónico</label><div class="form-row"><input id="email" type="email" autocomplete="email" required maxlength="254" aria-describedby="access-status local-note"><button type="submit">Recibir enlace</button></div></form><p id="access-status" class="status" role="status" aria-live="polite"></p><p id="local-note" class="local-note">Abre el enlace en este mismo ordenador.</p></div>
+      <div id="access-section" class="card"><h2 id="account-heading" tabindex="-1">Entrar con un enlace</h2><p>No necesitas contraseña.</p><form id="access-form" novalidate hidden><label for="email">Correo electrónico</label><div class="form-row"><input id="email" type="email" autocomplete="email" required maxlength="254" aria-describedby="access-status local-note"><button type="submit">Recibir enlace</button></div></form><p id="access-status" class="status" role="status" aria-live="polite"></p><p id="local-note" class="local-note">El enlace inicia sesión únicamente en el navegador y dispositivo donde lo abras. Si lo abres en el móvil, la sesión quedará abierta en el móvil, no en este ordenador. No compartas el enlace.</p></div>
       <div id="verify-section" class="card" hidden><h2 id="verify-title" tabindex="-1">Comprobando tu enlace</h2><p id="verify-status" class="status" role="status" aria-live="assertive"></p><button id="verify-retry" hidden>Reintentar</button><a id="verify-new" class="button-link" href="#cuenta" hidden>Solicitar otro enlace</a></div>
-      <div id="account-section" class="card" hidden><div class="section-heading"><h2 id="account-title" tabindex="-1">Mi cuenta</h2><button id="logout" class="secondary">Cerrar sesión</button></div><dl id="profile" class="profile"></dl><h3>Sesiones abiertas</h3><ul id="sessions" class="session-list"></ul><p id="account-status" class="status" role="status"></p><button id="sessions-retry" class="secondary" hidden>Reintentar</button></div>
+      <div id="account-section" class="card" aria-busy="false" hidden><div class="section-heading"><h2 id="account-title" tabindex="-1">Mi cuenta</h2><button id="logout" class="secondary">Cerrar sesión</button></div><dl id="profile" class="profile"></dl><h3>Sesiones abiertas</h3><ul id="sessions" class="session-list"></ul><p id="account-status" class="status" role="status" aria-live="polite"></p><button id="sessions-retry" class="secondary" hidden>Reintentar</button></div>
     </section>
   </main>
   <footer><p>RutaViva Community · Datos orientativos · <a href="https://www.openstreetmap.org/copyright" rel="external">© OpenStreetMap contributors</a></p></footer>
