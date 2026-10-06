@@ -33,7 +33,7 @@ const contributionBody = {
 };
 const updateBody = {
   type: 'object', additionalProperties: false, required: ['version', 'title', 'geometry'],
-  properties: { version: { type: 'integer', minimum: 1 }, kind: contributionBody.properties.kind, title: { type: 'string', minLength: 5, maxLength: 80 }, description: { type: 'string', maxLength: 500, default: '' }, geometry, ...accessibilityProperties }
+  properties: { version: { type: 'integer', minimum: 1 }, zoneId: { anyOf: [UUID, { type:'null' }] }, kind: contributionBody.properties.kind, title: { type: 'string', minLength: 5, maxLength: 80 }, description: { type: 'string', maxLength: 500, default: '' }, geometry, ...accessibilityProperties }
 };
 const versionBody = { type: 'object', additionalProperties: false, required: ['version'], properties: { version: { type: 'integer', minimum: 1 } } };
 const reactionBody = { type: 'object', additionalProperties: false, required: ['reaction'], properties: { reaction: { type: 'string', enum: ['confirm', 'reject'] } } };

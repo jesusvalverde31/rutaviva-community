@@ -22,6 +22,7 @@ export function stopDrawing(){ drawing=false; }
 export function addCenterPoint(){ if(map&&points.length<50){ const c=map.getCenter(); points.push([Number(c.lng.toFixed(6)),Number(c.lat.toFixed(6))]); refreshDraw(); }}
 export function undoPoint(){ points.pop(); refreshDraw(); }
 export function clearDrawing(){ points=[]; refreshDraw(); }
+export function setDrawingGeometry(geometry){points=geometry?.type==='Point'?[geometry.coordinates]:geometry?.type==='LineString'?[...geometry.coordinates]:[];drawing=false;refreshDraw();if(points.length&&map){const lng=points.reduce((sum,point)=>sum+point[0],0)/points.length,lat=points.reduce((sum,point)=>sum+point[1],0)/points.length;map.flyTo({center:[lng,lat],zoom:15,essential:false});}}
 export function geometryFor(kind){ if(!points.length)return null; if(['barrier','closure','lighting'].includes(kind))return{type:'Point',coordinates:points.at(-1)}; return points.length<2?null:{type:'LineString',coordinates:[...points]}; }
 export function focusContribution(item){ if(!map||!item?.geometry)return; const pts=item.geometry.type==='Point'?[item.geometry.coordinates]:item.geometry.coordinates; const lng=pts.reduce((s,p)=>s+p[0],0)/pts.length; const lat=pts.reduce((s,p)=>s+p[1],0)/pts.length; map.flyTo({center:[lng,lat],zoom:15,essential:false}); }
 export function focusZone(bbox){if(!map||!Array.isArray(bbox)||bbox.length!==4||bbox.some(value=>!Number.isFinite(Number(value))))return;map.fitBounds([[Number(bbox[0]),Number(bbox[1])],[Number(bbox[2]),Number(bbox[3])]],{padding:36,essential:false});}

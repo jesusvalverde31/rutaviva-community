@@ -1,4 +1,4 @@
-# Moderación propuesta
+# Moderación
 
 ## Criterios operativos de accesibilidad
 
@@ -36,7 +36,13 @@ Una cuenta suspendida conserva exportación, borrado y apelación. Exportación:
 
 Ningún `PATCH` genérico cambia estados. Una versión publicada nunca se sobrescribe. Confirmaciones y rechazos priorizan revisión, pero no publican contenido.
 
-## Denuncias y apelaciones
+## Reportes de contenido implementados
+
+Una cuenta autenticada puede reportar una aportación publicada por posible dato personal, contenido abusivo, peligro, spam u otro motivo. El reporte permanece privado y pendiente; no despublica contenido, no cambia rutas y no aumenta automáticamente la prioridad de una decisión. La cola visible para moderación no expone quién reportó.
+
+La cuenta autora y la cuenta reportante quedan excluidas de la cola y no pueden decidir el reporte, incluso si poseen rol moderador. Otra cuenta moderadora documenta un motivo y elige `dismiss` para mantener la publicación o `resolve` para retirarla. La versión evita decisiones sobre estados obsoletos y la clave idempotente evita duplicar historial o auditoría en un reintento. La auto-moderación y la auto-revisión de reportes continúan prohibidas.
+
+## Denuncias y apelaciones propuestas
 
 Denuncia: `open → triaged → investigating → resolved/dismissed`. Apelación: `submitted → appeal_review → restored/rejection_confirmed`. Solo el autor afectado apela y solo existe una apelación activa por decisión. Cuando sea posible, la resuelve otra persona. Motivo público y notas internas quedan separados.
 

@@ -11,8 +11,8 @@ Render Free puede dormir tras inactividad y Supabase Free puede pausarse. Esta b
 1. Crea una rama corta desde `origin/main`.
 2. Ejecuta `npm run build`, `npm run check`, `npm test` y `git -c core.whitespace=cr-at-eol diff --check`.
 3. Abre una PR; `verify` debe quedar en verde.
-4. Fusiona mediante squash y comprueba el mismo SHA en Render como `Live`.
-5. Ejecuta `npm run smoke:production` o el workflow manual `Production smoke` desde `main`.
+4. Fusiona mediante squash. Render despliega el commit recibido en `main`; la protección de rama ya exige que la PR supere `verify`.
+5. La CI correcta de `main` inicia `Production smoke`, que compara el SHA servido por `/api/v1/health` con el fusionado. Si hace falta, repítelo manualmente desde `main`.
 6. Crea la etiqueta y la GitHub Release solo después del smoke verde.
 
 Consulta `docs/OPERACION-PRODUCCION.md`, `docs/RECUPERACION-Y-ROLLBACK.md` y `docs/CHECKLIST-RELEASE.md`. `/health` mide vida del proceso; `/ready` valida dependencias. Nunca copies secretos a una incidencia, log compartido o comando documentado.
