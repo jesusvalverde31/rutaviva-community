@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@fastify/helmet": "13.1.1",
-    "fastify": "5.12.5",
+    "fastify": "5.12.6",
     "maplibre-gl": "6.10.0",
     "pg": "8.23.0"
   }
